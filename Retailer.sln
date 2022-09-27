@@ -36,6 +36,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Grpc", "Grpc", "{89458341-7
 		GrpcGeneral.txt = GrpcGeneral.txt
 		GrpcInterceptors.txt = GrpcInterceptors.txt
 		GrpcLoadBalancing.txt = GrpcLoadBalancing.txt
+		GrpcPerformance.txt = GrpcPerformance.txt
 		GrpcRetries.txt = GrpcRetries.txt
 		GrpcServer.txt = GrpcServer.txt
 	EndProjectSection
