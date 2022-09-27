@@ -21,28 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Retailer.WebAPI", "Retailer
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Retailer.WASM", "Retailer.WASM\Retailer.WASM.csproj", "{50AA1EA2-E345-4224-9BC8-BA9DC54048EA}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ResourcesAndNotes", "ResourcesAndNotes", "{A6DE939A-FBA0-4C4E-9397-5AB3815A7647}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Retailer.GrpcInternalService", "Retailer.GrpcInternalService\Retailer.GrpcInternalService.csproj", "{B6553DAB-E8E0-4BC4-9FC7-09B997844439}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Grpc", "Grpc", "{89458341-7307-455D-94A3-011B6A08AD70}"
-	ProjectSection(SolutionItems) = preProject
-		GrpcCancellation.txt = GrpcCancellation.txt
-		GrpcClient.txt = GrpcClient.txt
-		GrpcClientMock.txt = GrpcClientMock.txt
-		GrpcDeadlinesAndCancellation.txt = GrpcDeadlinesAndCancellation.txt
-		GrpcGeneral.txt = GrpcGeneral.txt
-		GrpcInterceptors.txt = GrpcInterceptors.txt
-		GrpcLoadBalancing.txt = GrpcLoadBalancing.txt
-		GrpcPerformance.txt = GrpcPerformance.txt
-		GrpcRetries.txt = GrpcRetries.txt
-		GrpcServer.txt = GrpcServer.txt
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Blazor", "Blazor", "{A6B5CBEB-2F77-416A-A7B6-E9389C28B221}"
-	ProjectSection(SolutionItems) = preProject
-		BlazorGeneral.txt = BlazorGeneral.txt
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Retailer.GrpcService", "Retailer.GrpcService\Retailer.GrpcService.csproj", "{DAD3CFA3-36E3-4406-9317-E5B117EB8863}"
 EndProject
@@ -99,10 +78,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{89458341-7307-455D-94A3-011B6A08AD70} = {A6DE939A-FBA0-4C4E-9397-5AB3815A7647}
-		{A6B5CBEB-2F77-416A-A7B6-E9389C28B221} = {A6DE939A-FBA0-4C4E-9397-5AB3815A7647}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {186CCA16-BB73-4F1C-BC5C-1637DD03AFC1}
