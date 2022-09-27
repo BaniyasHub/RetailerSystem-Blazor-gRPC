@@ -1,0 +1,75 @@
+﻿@page "/productPricing/Upsert/{productId:int}"
+@page "/productPricing/Upsert/{productId:int}/{productPriceId:int}"
+@inject NavigationManager _navigationManager
+@inject IJSRuntime _jsRuntime
+@inject IProductManager _productManager
+
+<h3>ProductPricingUpsert</h3>
+
+<EditForm Model="productPriceDto" OnValidSubmit="UpsertProductPrice">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    Size :  <InputSelect @bind-Value="productPriceDto.Size">
+        <option value="">Select classification ...</option>
+        @foreach (var size in SizeList)
+        {
+            <option value="@size">@size</option>
+        }
+    </InputSelect>
+    Price : <InputNumber @bind-Value="productPriceDto.Price"></InputNumber>
+
+    <button class="btn btn-primary" type="submit">Save</button>
+</EditForm>
+    <button class="btn btn-primary" @onclick="BackToPricing">Back</button>
+
+@code {
+    [Parameter]
+    public int productPriceId { get; set; }
+
+    [Parameter]
+    public int productId { get; set; }
+
+    public ProductPriceDto productPriceDto { get; set; } = new();
+
+    IEnumerable<String> SizeList = new List<String>()
+    {
+        "Small","Medium","Large","8oz","16oz","24oz"
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (productPriceId > 0)
+        {
+            productPriceDto = await _productManager.GetProductPriceById(productPriceId);
+        }
+    }
+
+    public async Task UpsertProductPrice()
+    {
+        productPriceDto.ProductId = productId;
+        if (productPriceId > 0)
+        {
+            await _productManager.EditProductPrice(productPriceDto);
+        }
+        else
+        {
+            await _productManager.AddProductPrice(productPriceDto);
+        }
+
+        if (productId > 0)
+        {
+            _navigationManager.NavigateTo($"product/price/{productId}");
+        }
+        else
+        {
+            _navigationManager.NavigateTo($"product/price/{productPriceDto.Product.Id}");
+        }
+    }
+
+    public void BackToPricing()
+    {
+        if (productId > 0)
+        {
+            _navigationManager.NavigateTo($"product/price/{productId}");
+        }
+    }
+}

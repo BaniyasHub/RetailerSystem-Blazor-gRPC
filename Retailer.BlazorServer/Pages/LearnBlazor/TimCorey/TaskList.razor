@@ -1,0 +1,60 @@
+﻿<h3>@Name's TaskList</h3>
+
+@if (taskList.Count > 0)
+{
+    <div class=" progress my-2">
+        <div class="progress-bar" role="progressbar" 
+            style="width: @percentDone%"
+            aria-valuemin="0" aria-valuemax="100">
+            @percentDone
+        </div>
+    </div>
+}
+
+<EditForm class="form-inline my-2" Model="newTask" OnValidSubmit="AddTask">
+    <InputText class="form-control mx-2 w-25" @bind-Value="newTask.Task"></InputText>
+    <button class="btn btn-outline-primary" type="submit">Add Task</button>
+</EditForm>
+
+<ul cclass="form-group">
+    @foreach (var task in taskList)
+    {
+        if (task.IsComplete)
+        {
+             <li
+                @onclick="(()=>task.IsComplete = !task.IsComplete)">
+                <del>@task.Task</del> 
+            </li>
+        }else
+        {
+             <li
+                @onclick="(()=>task.IsComplete = !task.IsComplete)">
+                @task.Task 
+            </li>
+        }
+       
+    }
+</ul>
+
+@code {
+    [Parameter]
+    public string? Name { get; set; }
+
+
+    private int percentDone
+    {
+        get
+        {
+            return (taskList.Count(x => x.IsComplete) * 100 / taskList.Count);
+        }
+    }
+
+    private List<TaskModel> taskList { get; set; } = new();
+    private TaskModel newTask = new();
+
+    private void AddTask()
+    {
+        taskList.Add(newTask);
+        newTask = new TaskModel();
+    }
+}

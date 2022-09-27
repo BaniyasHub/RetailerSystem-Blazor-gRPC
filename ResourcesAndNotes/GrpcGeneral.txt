@@ -1,0 +1,61 @@
+Grpc ToDo
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Investigate Grpc Documents//
+Investigate HTTP Documents//
+Search CORS
+Proxy Problems?
+WriteAsync ThreadSafe?
+Ping for sleeping connections?
+What happens if app stay online for days?
+All use cases of Cancellation Token
+Practice Deadlines - Retries
+Any-OneOf-Value Protobuf Types
+Versioning & Testing Grpc Stack
+Examine Different Client-Server Scenarios using Grpc methods
+What are the exposed headers like "Grpc-Status", "Grpc-Encoding"
+Use GrpcClient and GrpcServer configurations to learn their use cases
+Is there any difference about awaiting the Grpc call and GrpcCall.ResponseAsync
+How to receive GrpcWeb and Grpc call in one server
+Implement unit testing from docs
+
+
+
+Grpc Methods Starts-Ends
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+All 4 method types ends after response sent - aware background tasks
+Client Streaming and BiDirectional methods starts without receiving message 
+If a gRPC method starts background tasks that use requestStream,responseStream or ServerCallContext it must complete the tasks before the gRPC method exits. 
+Continuing to use the context, stream reader, or stream writer after the gRPC method exists causes errors and unpredictable behavior
+
+One important difference gRPC methods have from actions is gRPC methods are not able to bind parts of a request to different method arguments. 
+gRPC methods always have one message argument for the incoming request data. 
+Multiple values can still be sent to a gRPC service by making them fields on the request message
+
+Ending wait for RequestStream & ResponseStream
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+While using client streaming call we need to notify the server with Requeststream.Completeasync to finish waiting requestStream
+Server streaming call ends when ResponseStream.MoveNext() returns false >> Does it do something except enabling us checking it as condition??
+
+
+Cancellation
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+By saying cancellation, we mean ending method fast after client aborted the Http Request
+For continious server streaming methods needs to use cancellation tokens to complete them quickly after client decides
+Other option is we can dispose the call(task), overall can use these two to method the server to end the call fast
+
+
+
+**gRPC Methods
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	a)Unary Call >> Has Sync and Async Method
+	
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	b)Client streaming
+	
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	b)Server Streaming
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	b)Bi-Directional Streaming
+	
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

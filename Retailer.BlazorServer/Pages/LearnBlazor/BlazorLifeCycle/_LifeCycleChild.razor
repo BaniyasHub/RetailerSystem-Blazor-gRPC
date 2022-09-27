@@ -1,0 +1,49 @@
+﻿
+
+<h3>LifeCycleChild</h3>
+
+
+<Virtualize Items="EventType" Context="eventyy">
+    <p>@eventyy</p>
+    <hr />
+</Virtualize>
+
+<div class="row">
+    @CountValue
+</div>
+
+@code {
+
+    public List<string> EventType { get; set; } = new List<string>();
+
+    [Parameter]
+    public int CountValue { get; set; }
+
+    protected override void OnInitialized()
+    {
+        EventType.Add("Child - OnInitialized is called");
+    }
+
+    //protected override async Task OnInitializedAsync()
+    //{
+    //    await Task.Delay(1000);
+    //    EventType.Add("OnInitializedAsync is called");
+    //}
+
+    protected override void OnParametersSet()
+    {
+        EventType.Add("OnParametersSet is called");
+    }
+
+    //protected override async Task OnParametersSetAsync()
+    //{
+    //    await Task.Delay(1000);
+    //    EventType.Add("OnParametersSetAsync is called");
+    //}
+
+     protected override void OnAfterRender(bool firstRender)
+    {
+        EventType.Add($"OnAfterRender is called {firstRender}");
+    }
+
+}

@@ -1,0 +1,135 @@
+﻿@page "/category/replicaCategoryList"
+@inject NavigationManager _navigationManager
+@inject IJSRuntime _jsRuntime
+@inject ICategoryManager _coreManager
+
+<div class="row mt-4">
+    <div class="col-6">
+        <h4 class="card-title text-primary">Category List</h4>
+
+        @if (IsLoading)
+        {
+            <div class="text-center">
+                <img src="images/loading.gif">
+            </div>
+        }
+        else
+        {
+            if (categoryList.Any())
+            {
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>CreationDate</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <Virtualize Items="categoryList" Context="category">
+                            <tr>
+                                <td class="w-25 ">@category.Name</td>
+                                <td class="w-25 text-center">@category.CreatedDate.GetValueOrDefault().ToShortDateString()</td>
+                                <td class="w-25">
+                                    <button class="btn btn-outline-primary m-2 p-2 w-25" @onclick="()=>NavigateToCategoryUpsert(category.Id)">Edit</button>
+                                    <button class="btn btn-outline-danger m-2 p-2 w-25" @onclick="()=>ShowDeleteConfirmation(category.Id)">Delete</button>
+                                </td>
+                            </tr>
+                        </Virtualize>
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>There is no category</p>
+            }
+
+        }
+    </div>
+
+    <div class="col-4 offset-2">
+        <a href="replica/category/add" class="btn btn-info text-light"> Add Category</a>
+    </div>
+</div>
+
+
+<CascadingValue Value="12" Name="FirstCascadingValue">
+    <_DeleteConfirmation @ref="deleteConfirmation" ParentDeleteEntity="DeleteCategory"
+                         ParentHideConfirmation="HideModelAndResetId">
+
+    </_DeleteConfirmation>
+</CascadingValue>
+
+
+
+
+@code {
+    private bool IsLoading { get; set; }
+
+    private int CategoryId { get; set; }
+
+    private List<CategoryDto> categoryList = new();
+
+    private _DeleteConfirmation deleteConfirmation;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCategories();
+    }
+
+    private async Task LoadCategories()
+    {
+        IsLoading = true;
+        StateHasChanged();
+
+        categoryList = await _coreManager.GetAllCategories();
+
+        IsLoading = false;
+        StateHasChanged();
+    }
+
+
+    private void NavigateToCategoryUpsert(int id)
+    {
+        _navigationManager.NavigateTo($"replica/category/edit/{id}");
+    }
+
+
+    //Just for using ref
+    public async Task ShowDeleteConfirmation(int id)
+    {
+        CategoryId = id;
+        await deleteConfirmation.ShowModal();
+
+    }
+
+    private async Task HideModelAndResetId()
+    {
+        CategoryId = 0;
+        await _jsRuntime.InvokeVoidAsync("HideDeleteConfirmationModel");
+    }
+
+    private async Task DeleteCategory()
+    {
+        if (CategoryId > 0)
+        {
+            IsLoading = true;
+            StateHasChanged();
+
+            await _coreManager.DeleteCategory(CategoryId);
+            await HideModelAndResetId();
+            categoryList = await _coreManager.GetAllCategories();
+
+            IsLoading = false;
+            StateHasChanged();
+
+            await _jsRuntime.ToastrSuccess("Category Deleted");
+            CategoryId = 0;
+        }
+    }
+
+
+
+}

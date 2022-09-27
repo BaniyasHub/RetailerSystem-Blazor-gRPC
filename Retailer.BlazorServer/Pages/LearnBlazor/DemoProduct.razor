@@ -1,0 +1,106 @@
+﻿@page "/learnBlazor/demoProduct"
+
+<h3 class="text-danger">DemoProduct</h3>
+<h4>Favorites Total = @selectedFavoriteCount</h4>
+<h4>Last Selected Product = @lastSelectedProductName</h4>
+
+<div class="row">
+    <GenericProduct title="Product-1" demoProduct="@demoProduct1" OnFavoriteSelectionEvent ="@FavoriteCountUpdate" ChangeSelectedProductNameEvent="@SelectedProductName"/>
+
+    <GenericProduct title="Product-2" demoProduct="@demoProduct2" OnFavoriteSelectionEvent ="@FavoriteCountUpdate" ChangeSelectedProductNameEvent="@SelectedProductName"/>
+   
+</div>
+
+@code {
+    private List<Demo_Product> demoProductList { get; set; } = new();
+
+    private Demo_Product demoProduct1 { get; set; }
+
+    private Demo_Product demoProduct2 { get; set; }
+
+    private int selectedFavoriteCount { get; set; }
+
+    private string lastSelectedProductName { get; set; }
+
+    protected override void OnInitialized()
+    {
+        demoProductList.Add(new Demo_Product()
+            {
+                Id = 1,
+                Name = "Mengerler",
+                IsActive = true,
+                Price = 12.99,
+                DD_Products = new List<Demo_DD_Product>()
+            {
+                new Demo_DD_Product()
+                  {
+                    Id = 1,
+                    Key = "Color",
+                    Value = "Blue"
+                  },
+                new Demo_DD_Product()
+                {
+                    Id = 2,
+                    Key = "Material",
+                    Value = "Steel"
+                },
+
+                new Demo_DD_Product()
+                {
+                    Id = 3,
+                    Key = "Size",
+                    Value = "200"
+                }
+            }
+            });
+        demoProductList.Add(new Demo_Product()
+            {
+                Id = 2,
+                Name = "Koç",
+                IsActive = true,
+                Price = 23.35,
+                DD_Products = new List<Demo_DD_Product>()
+            {
+                new Demo_DD_Product()
+                  {
+                    Id = 1,
+                    Key = "Color",
+                    Value = "Purple"
+                  },
+                new Demo_DD_Product()
+                {
+                    Id = 2,
+                    Key = "Material",
+                    Value = "Coal"
+                },
+
+                new Demo_DD_Product()
+                {
+                    Id = 3,
+                    Key = "Size",
+                    Value = "300"
+                }
+            }
+            });
+
+        demoProduct1 = demoProductList.FirstOrDefault();
+        demoProduct2 = demoProductList.FirstOrDefault(x => x.Id != demoProduct1.Id);
+    }
+
+    protected void FavoriteCountUpdate(bool isSelected)
+    {
+        if (isSelected == true)
+        {
+            selectedFavoriteCount++;
+        }else
+        {
+            selectedFavoriteCount--;
+        }
+    }
+
+    protected void SelectedProductName(string productName)
+    {
+        lastSelectedProductName = productName;
+    }
+
+}

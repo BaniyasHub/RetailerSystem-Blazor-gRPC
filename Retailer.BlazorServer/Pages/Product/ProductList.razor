@@ -1,0 +1,174 @@
+﻿@page "/product/productList"
+@using Retailer.Common.Utility
+@inject NavigationManager _navigationManager
+@inject IJSRuntime _jsRuntime
+@inject ICategoryManager _categoryManager
+@inject IProductManager _productManager
+@inject IFileService _fileService
+@inject IGrpcClient _grpcClient
+@*@attribute [Authorize(Roles =SD.Role_Admin)]*@
+
+
+<div class="row mt-4">
+    <div class="col-6">
+        <h4 class="card-title text-primary">Product List</h4>
+
+        @if (isLoading)
+        {
+            <div class="text-center">
+                <img src="images/loading.gif">
+            </div>
+        }
+        else
+        {
+            if (productList.Any())
+            {
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Shop Favorites</th>
+                            <th>Customer Favorites</th>
+                            <th>Category</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <Virtualize Items="productList" Context="product">
+                            <tr>
+                                <td class="w-20 ">@product.Name</td>
+                                <td class="w-15 text-center">
+                                    <input type="checkbox" disabled checked="@(product.ShopFavorites == true ? "true" : null)" />
+                                </td>
+                                <td class="w-15 text-center">
+                                    <input type="checkbox" disabled checked="@(product.CustomerFavorites == true ? "true" : null)" />
+                                </td>
+                                <td class="w-20 ">@product.Category?.Name</td>
+                                <td>
+                                    @*<NavLink class="btn btn-primary" href=@($"product/productUpsert/{product.Id}")>Edit</NavLink>*@
+                                    <button class="btn btn-outline-primary m-2 p-2 " @onclick="()=>NavigateToProductUpsert(product.Id)">Edit</button>
+                                    <button class="btn btn-outline-primary m-2 p-2 " @onclick="()=>NavigateToPricing(product.Id)">Price</button>
+                                    <button class="btn btn-outline-danger m-2 p-2 " @onclick="()=>ShowDeleteConfirmation(product.Id)">Delete</button>
+                                </td>
+                            </tr>
+                        </Virtualize>
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>There is no product</p>
+            }
+
+        }
+    </div>
+
+    <div @ref="elementRef" class="col-4 offset-2">
+        <a href="product/add" class="btn btn-info text-light"> Add Product</a>
+    </div>
+</div>
+
+
+<_DeleteConfirmation @ref="deleteConfirmation"
+                     ParentDeleteEntity="DeleteProduct" ParentHideConfirmation="HideModelAndResetId">
+</_DeleteConfirmation>
+
+
+
+
+@code {
+    private bool isLoading { get; set; }
+
+    private int productId { get; set; }
+
+    private List<ProductDto> productList = new();
+
+    private _DeleteConfirmation deleteConfirmation;
+
+    public ElementReference elementRef { get; set; }
+
+    public WisdomDto wisdomDto { get; set; }
+
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //await _grpcClient.BiDirectionalExample();
+        wisdomDto = await _grpcClient.GetWisdomModel();
+
+        await LoadProducts();
+    }
+
+    private async Task LoadProducts()
+    {
+        isLoading = true;
+        StateHasChanged();
+        try
+        {
+            productList = await _grpcClient.GetAllProducts();
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+        //productList = await _grpcClient.GetAllProducts();
+
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    private void NavigateToProductUpsert(int id)
+    {
+        _navigationManager.NavigateTo($"product/edit/{id}");
+    }
+
+    private void NavigateToPricing(int id)
+    {
+        _navigationManager.NavigateTo($"product/price/{id}");
+    }
+
+    //Just for using ref
+    private async Task ShowDeleteConfirmation(int id)
+    {
+        productId = id;
+        await deleteConfirmation.ShowModal();
+
+    }
+
+    private async Task HideModelAndResetId()
+    {
+        productId = 0;
+        await _jsRuntime.InvokeVoidAsync("HideDeleteConfirmationModel");
+    }
+
+    private async Task DeleteProduct()
+    {
+        if (productId > 0)
+        {
+            isLoading = true;
+            StateHasChanged();
+
+            var product = await _productManager.GetProduct(productId);
+            await _productManager.DeleteProduct(productId);
+
+            if (product.ImageUrl.Contains("default.png"))
+            {
+                _fileService.DeleteFile(product.ImageUrl);
+            }
+
+            await HideModelAndResetId();
+            productList = await _productManager.GetAllProducts();
+
+            isLoading = false;
+            StateHasChanged();
+
+            await _jsRuntime.ToastrSuccess("Product Deleted");
+            productId = 0;
+        }
+    }
+
+
+}

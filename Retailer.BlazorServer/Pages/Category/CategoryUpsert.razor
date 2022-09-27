@@ -1,0 +1,81 @@
+﻿@page "/replica/category/add"
+@page "/replica/category/edit/{categoryId:int}"
+@inject NavigationManager _navigationManager
+@inject IJSRuntime _jsRuntime
+@inject ICategoryManager _coreManager
+
+<h3>ReplicaCategoryInsert</h3>
+
+@if (IsLoading)
+{
+    <div class="text-center">
+        <img src="images/loading.gif" />
+    </div>
+}
+else
+{
+    <EditForm Model="@category" OnValidSubmit="UpsertCategory">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+
+        <InputText class="form-control w-50" id="name" @bind-Value="category.Name"></InputText>
+        <ValidationMessage For="()=>category.Name"></ValidationMessage>
+        <InputDate class="form-control w-50" id="creationDate" @bind-Value="category.CreatedDate"></InputDate>
+        <ValidationMessage For="()=>category.CreatedDate"></ValidationMessage>
+
+
+        <button class="btn btn-outline-info" type="submit">@(CategoryId>0 ? "Edit" : "Add")</button>
+        <NavLink class="btn btn-dark" @onclick="()=>_navigationManager.NavigateTo(BackTo)">Go back</NavLink>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int CategoryId { get; set; }
+
+    public bool IsLoading { get; set; }
+
+    public CategoryDto category { get; set; } = new();
+
+    public string BackTo { get; set; } = "/category/replicaCategoryList";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && CategoryId > 0)
+        {
+            category = await _coreManager.GetCategory(CategoryId);
+            StateHasChanged();
+        }
+
+    }
+
+    public async Task UpsertCategory()
+    {
+        try
+        {
+            IsLoading = true;
+            StateHasChanged();
+
+            if (CategoryId > 0)
+            {
+                await _coreManager.UpdateCategory(category);
+                await _jsRuntime.ToastrSuccess("Category updated");
+            }
+            else
+            {
+                await _coreManager.AddCategory(category);
+                await _jsRuntime.ToastrSuccess("Category added!");
+
+                category = new();
+            }
+
+            IsLoading = false;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+
+    }
+
+}

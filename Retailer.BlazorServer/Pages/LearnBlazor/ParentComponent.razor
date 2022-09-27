@@ -1,0 +1,101 @@
+﻿@page "/learnBlazor/parentComponent"
+
+<h3>Parent - Child Relation</h3>
+
+@if (AmI)
+{
+    <span>I'm selected</span>
+}
+
+<div>
+    <span>@lastSelectedDiv</span>
+</div>
+
+<CascadingValue Value="MessageForGrandChild" Name="message" IsFixed="true">
+
+    <CascadingValue Value="7" Name="luckyNumber">
+
+        <_ChildComponent @ref="childComponent" OnButtonClick="ShowMessage" Title="Heyyy"
+                         ChangeSelectedDivOnChild="@ChangeSelectedDiv" SelectionOfChild="@SelectionOfOurs">
+
+            <ChildContent>
+                Render fragment from Parent!!
+            </ChildContent>
+            <DangerContent>
+                Danger content from Parent!!
+            </DangerContent>
+
+            <FirstRenderFragment>
+                @FirstRenderFragmentValue
+            </FirstRenderFragment>
+
+            <SecondRenderFragment>
+                @SecondRenderFragmentValue
+            </SecondRenderFragment>
+
+        </_ChildComponent>
+
+    </CascadingValue>
+
+</CascadingValue>
+
+<span class="text-info">@messageText</span>
+
+<_AnotherChildComponent AttributeSplatting="@AttributeSplattingFromParent">
+
+</_AnotherChildComponent>
+
+
+
+<div>
+    <button class="btn btn-success" @onclick="()=>childComponent.ToastrSuccess()">Show Sweetalert</button>
+</div>
+
+@code {
+    public string messageText { get; set; }
+
+    public string lastSelectedDiv { get; set; }
+
+    public bool AmI { get; set; }
+
+    public string FirstRenderFragmentValue { get; set; } = "#1";
+
+    public string SecondRenderFragmentValue { get; set; } = "#2";
+
+    public string MessageForGrandChild { get; set; } = "This is a message from grandmom";
+
+    public int LuckyNumber { get; set; }
+
+    [Parameter]
+    public Dictionary<string, object> AttributeSplattingFromParent { get; set; } = new()
+    {
+        {"required",true},
+        {"placeholder","Placeholder from parent"},
+        {"maxLength",5}
+    };
+
+    private _ChildComponent childComponent;
+
+    private void ShowMessage()
+    {
+        if (!string.IsNullOrEmpty(messageText))
+        {
+            messageText = "";
+        }
+        else
+        {
+            messageText = "Button clicked from child component";
+        }
+    }
+
+    public void ChangeSelectedDiv(string selectedDiv)
+    {
+        lastSelectedDiv = selectedDiv;
+    }
+
+    public void SelectionOfOurs(bool selection)
+    {
+        AmI = selection;
+    }
+
+}

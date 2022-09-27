@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Retailer.Common\Retailer.Common.csproj" />
+    <ProjectReference Include="..\Retailer.DataAccess\Retailer.DataAccess.csproj" />
+    <ProjectReference Include="..\Retailer.Data\Retailer.Data.csproj" />
+    <ProjectReference Include="..\Retailer.Interface\Retailer.Interface.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="11.0.1" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,96 @@
+﻿@page "/learnBlazor/blazorJs/learnBlazorJs"
+@inject IJSRuntime _JsRuntime
+
+<h3>LearnBlazorJs</h3>
+
+<div class="row">
+    <button class="btn btn-secondary w-25 form-control row" @onclick="TextConfirmBox">
+        Test Confirm Button
+    </button>
+
+    <br />
+    <br />
+    <br />
+
+
+    <div class="row">
+        <input type="checkbox" class="w-50" @bind-value="@ConfirmResult" checked="@(ConfirmResult == true ? "checked" : null)" />
+    </div>
+
+
+    <div class="row">
+        @if (ConfirmResult)
+        {
+            <p>Confirmation has been made</p>
+        }
+        else
+        {
+            <p>Confirmation Pending </p>
+        }
+    </div>
+
+
+    <br />
+    <br />
+    <br />
+
+    <div class="row">
+
+        <button class="btn btn-success w-25 form-control row" @onclick="ToastrSuccess">
+            Toastr Success
+        </button>
+
+        <button class="btn btn-danger w-25 form-control row" @onclick="ToastrError">
+            Toastr Failed
+        </button>
+
+    </div>
+
+    <br />
+
+    <div class="row">
+
+        <button class="btn btn-success w-25 form-control row" @onclick="SweetalertSuccess">
+            Sweetalert Success
+        </button>
+
+        <button class="btn btn-danger w-25 form-control row" @onclick="SweetalertError">
+            Sweetalert Failed
+        </button>
+
+    </div>
+
+
+</div>
+
+@code {
+
+    private string ConfirmMessage = "Are you sure you want to click?";
+
+    public bool ConfirmResult { get; set; }
+
+    public async Task TextConfirmBox()
+    {
+        ConfirmResult = await _JsRuntime.InvokeAsync<bool>("confirm", ConfirmMessage);
+    }
+
+    public async Task ToastrSuccess()
+    {
+        await _JsRuntime.ToastrSuccess("Success");
+    }
+
+    public async Task ToastrError()
+    {
+        await _JsRuntime.ToastrFailed("Error");
+    }
+
+    public async Task SweetalertSuccess()
+    {
+        await _JsRuntime.InvokeVoidAsync("ShowSwal", "success", "task completed");
+    }
+
+    public async Task SweetalertError()
+    {
+        await _JsRuntime.InvokeVoidAsync("ShowSwal", "error", "task failed");
+    }
+}

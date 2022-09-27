@@ -1,0 +1,46 @@
+﻿
+ <div @onclick="(args)=>ChangeSelectedProductName(args,demoProduct.Name)" class="col-6">
+        <h4>@title</h4>
+        <input type="checkbox" @onchange="FavoriteUpdated"/> Add to Favorite <br /><br />
+
+        <span class="form-control">Name = @demoProduct.Name</span>
+        Show Properties : <input type="checkbox" @bind-value="@demoProduct.IsActive" checked="@(demoProduct.IsActive == true ? "checked":null)" />
+
+        @foreach (var item in @demoProduct.DD_Products)
+        {
+              if (@demoProduct.IsActive)
+            {
+                <span class="form-control" >@item.Key : @item.Value</span>
+            }
+        }
+
+        <span class="form-control">
+            <button class="btn btn-danger">Delete</button>
+            <button class="btn btn-info">Edit</button>
+        </span>
+    </div>
+
+@code {
+        [Parameter]
+        public string title { get; set; } = "";
+
+        [Parameter]
+        public Demo_Product demoProduct { get; set; } = new();
+
+        [Parameter]
+        public EventCallback<bool> OnFavoriteSelectionEvent { get; set; }
+
+        [Parameter]
+        public EventCallback<string> ChangeSelectedProductNameEvent { get; set; }
+
+        private async Task FavoriteUpdated(ChangeEventArgs e)
+        {
+            await OnFavoriteSelectionEvent.InvokeAsync((bool)e.Value);
+        }
+
+        private async Task ChangeSelectedProductName(MouseEventArgs e,string name)
+        {
+
+            await ChangeSelectedProductNameEvent.InvokeAsync(name);
+        }
+}

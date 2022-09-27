@@ -1,0 +1,75 @@
+﻿@page "/grpcDemo"
+@inject IGrpcClient _grpcClient
+<h3>GrpcComponent</h3>
+
+<h4>
+    @BlazingStar
+</h4>
+
+<br />
+
+<h5>
+    <Virtualize Context="customer" Items="Customers">
+        <span class="row">@customer.FirstName</span>
+        <span class="row">@customer.LastName</span>
+        <span class="row">@customer.EmailAddress</span>
+        <span class="row">@customer.Age</span>
+        <span class="row">@customer.IsAlive</span>
+        <br />
+    </Virtualize>
+</h5>
+
+
+<h5>
+    <br />
+    <span class="row">@Customer.FirstName</span>
+    <span class="row">@Customer.LastName</span>
+    <span class="row">@Customer.EmailAddress</span>
+    <span class="row">@Customer.Age</span>
+    <span class="row">@Customer.IsAlive</span>
+</h5>
+
+
+
+@code {
+    
+
+    public string BlazingStar { get; set; }
+
+    public CustomerDto Customer { get; set; } = new();
+
+    public List<CustomerDto> Customers { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            BlazingStar = await _grpcClient.GetGreeting();
+
+            Customer = await _grpcClient.GetCustomerById(1);
+        }
+        catch (Exception)
+        {
+
+        }
+
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            Customers = await _grpcClient.GetAllCustomers();
+
+        }
+        catch (Exception)
+        {
+
+        }
+        StateHasChanged();
+    }
+
+
+
+}

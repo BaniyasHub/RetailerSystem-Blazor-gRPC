@@ -1,0 +1,50 @@
+﻿@page "/"
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+<ErrorBoundary>
+
+    <ChildContent>
+        <GrpcCustomer ParentNotifySecondComponent="NotifySecondComponent">
+        </GrpcCustomer>
+    </ChildContent>
+
+    <ErrorContent>
+        <div class="text-danger">There was an error</div>
+    </ErrorContent>
+
+
+</ErrorBoundary>
+
+
+<ErrorBoundary>
+
+    <ChildContent>
+        <GrpcCustomer @ref="secondGrpcCustomer">
+        </GrpcCustomer>
+    </ChildContent>
+
+
+    <ErrorContent>
+        <div class="text-danger">There was an error</div>
+    </ErrorContent>
+
+</ErrorBoundary>
+
+
+@code {
+    private GrpcCustomer secondGrpcCustomer { get; set; }
+
+    private async Task NotifySecondComponent()
+    {
+        await secondGrpcCustomer.LoadCustomers();
+    }
+}
+
+

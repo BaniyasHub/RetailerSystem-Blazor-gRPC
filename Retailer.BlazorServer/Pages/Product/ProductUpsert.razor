@@ -1,0 +1,195 @@
+﻿@page "/product/add"
+@page "/product/edit/{productId:int}"
+@inject IProductManager _productManager
+@inject ICategoryManager _categoryManager
+@inject IFileService _fileService
+@inject IJSRuntime _jsRuntime
+@inject NavigationManager _navigationManager
+@using FileInfo = System.IO.FileInfo;
+
+
+<h3>@title</h3>
+
+
+<div class="row">
+    <div class="col-8">
+        <EditForm Model="product" OnValidSubmit="UpsertProduct">
+            <DataAnnotationsValidator></DataAnnotationsValidator>
+
+            <div class="form-group">
+                <label>Name</label>
+                <InputText class="form-control" @bind-Value="product.Name"></InputText>
+                <ValidationMessage For="()=>product.Name"></ValidationMessage>
+            </div>
+            <br />
+
+            <div class="form-group">
+                <label>Description</label>
+                <InputText class="form-control" @bind-Value="product.Description"></InputText>
+                <ValidationMessage For="()=>product.Description"></ValidationMessage>
+            </div>
+            <br />
+
+            <div class="form-group">
+                <label>Color</label>
+                <InputText class="form-control" @bind-Value="product.Color"></InputText>
+                <ValidationMessage For="()=>product.Color"></ValidationMessage>
+            </div>
+
+            <br />
+
+            <div class="row pt-3">
+
+                <div class="form-group col-6">
+                    <div class="form-check">
+                        <InputCheckbox class="form-check-input" @bind-Value="product.ShopFavorites"></InputCheckbox>
+                        <label>Is Shop Favorite</label>
+                        <ValidationMessage For="()=>product.ShopFavorites"></ValidationMessage>
+                    </div>
+                </div>
+
+                <div class="form-group col-6">
+                    <div class="form-check">
+                        <InputCheckbox class="form-check-input" @bind-Value="product.CustomerFavorites"></InputCheckbox>
+                        <label>Is Customer Favorite</label>
+                        <ValidationMessage For="()=>product.CustomerFavorites"></ValidationMessage>
+                    </div>
+                </div>
+
+            </div>
+            <br />
+
+
+            <div class="row pt-3">
+
+                <div class="form-group col-6">
+                    <label>Category</label>
+                    <InputSelect class="form-select" @bind-Value="product.CategoryId">
+                        <option value="0" disabled="disabled" selected>--Select Category--</option>
+                        @foreach (var category in categoryList)
+                        {
+                            <option value="@category.Id">@category.Name</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="()=>product.CategoryId"></ValidationMessage>
+                </div>
+
+                <div class="form-group col-6" >
+                    <label>Upload Image</label>
+                    <InputFile OnChange="HandleImageUpload" class="form-control"></InputFile>
+                </div>
+
+            </div>
+
+            <br />
+
+            <div class="form-group py-2">
+                <button class="btn btn-danger" type="submit"> @(productId > 0 ? "Edit" : "Add") </button>
+                <NavLink class="btn btn-success" href="product/productList">Back to List</NavLink>
+            </div>
+
+        </EditForm>
+    </div>
+
+    <div class="offset-1 col-1" style="width:200px; height:200px;">
+        <img src="@product.ImageUrl" />
+    </div>
+</div>
+
+
+
+@code {
+
+    [Parameter]
+    public int productId { get; set; }
+
+    private string title { get; set; } = "Add product";
+
+    private string OldImageUrl { get; set; }
+
+    private ProductDto product { get; set; } = new()
+    {
+        ImageUrl = "/images/default.png"
+    };
+
+    private List<CategoryDto> categoryList { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProperties();
+    }
+
+    private async Task LoadProperties()
+    {
+        if (productId > 0)
+        {
+            title = "Edit Product";
+            product = await _productManager.GetProduct(productId);
+            OldImageUrl = product.ImageUrl;
+        }
+
+        categoryList = await _categoryManager.GetAllCategories();
+    }
+
+    private async Task UpsertProduct()
+    {
+        try
+        {
+            if (productId > 0)
+            {
+                if (OldImageUrl != product.ImageUrl)
+                {
+                    _fileService.DeleteFile(OldImageUrl);
+                }
+                await _productManager.UpdateProduct(product);
+                await _jsRuntime.ToastrSuccess("Product Added");
+
+                product = new();
+            }
+            else
+            {
+                await _productManager.AddProduct(product);
+                await _jsRuntime.ToastrSuccess("Product Updated");
+            }
+
+            _navigationManager.NavigateTo("product/productList");
+        }
+        catch (Exception)
+        {
+            await _jsRuntime.ToastrFailed("Upserting Product failed");
+            throw;
+        }
+
+    }
+
+    private async Task HandleImageUpload(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            if (e.GetMultipleFiles().Count > 0)
+            {
+                foreach (var file in e.GetMultipleFiles())
+                {
+                    FileInfo fileInfo = new(file.Name);
+                    if (fileInfo.Extension.ToLower() == ".jpg" 
+                    || fileInfo.Extension.ToLower() == ".png" 
+                    || fileInfo.Extension.ToLower() == ".jpeg")
+                    {
+                        product.ImageUrl = await _fileService.UploadFile(file);
+                    }else
+                    {
+                        await _jsRuntime.ToastrFailed("Upload a proper image with known extension");
+                        return;
+                    }
+                }
+            }
+        }
+        catch (Exception)
+        {
+            await _jsRuntime.ToastrFailed("Upload a proper image");
+            throw;
+        }
+    }
+
+
+}

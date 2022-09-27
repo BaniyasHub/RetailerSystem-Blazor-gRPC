@@ -1,0 +1,93 @@
+﻿@page "/personarea"
+@using Retailer.Data.Models
+@inject IPeopleData PeopleService
+
+<PageTitle>Person List</PageTitle>
+
+<h3>Person List</h3>
+<h4>Insert new people</h4>
+
+<EditForm Model="@newPerson" OnValidSubmit="OnClickInsert">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <InputText id="firstName" @bind-Value="newPerson.FirstName" />
+    <InputText id="lastname" @bind-Value="newPerson.LastName" />
+    <InputText id="emailAddress" @bind-Value="newPerson.EmailAddress" />
+
+    <button type="submit" class="btn btn-warning">Submit</button>
+</EditForm>
+
+
+@if (personList == null || personList.Count < 1)
+{
+    <h4 class="text-primary">There is no data</h4>
+
+    <button class="btn btn-primary" @onclick="OnClickLoadPeople"> Get All People</button>
+
+    <br />
+    <br />
+}
+else
+{
+    <table class="table">
+        <thead>
+        <th>
+            FirstName
+        </th>
+        <th>
+            LastName
+        </th>
+        <th>
+            Email
+        </th>
+        </thead>
+
+        <tbody>
+            @foreach (var person in personList)
+            {
+                <tr>
+                    <td>@person.FirstName</td>
+                    <td>@person.LastName</td>
+                    <td>@person.EmailAddress</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button class="btn btn-danger" @onclick="OnClickReset"> Reset </button>
+}
+
+
+
+@code {
+    private List<Person> personList = new();
+    private Person newPerson = new();
+
+    private async Task OnClickLoadPeople()
+    {
+        personList = await PeopleService.GetAllPeople();
+    }
+
+    private void OnClickReset()
+    {
+        personList = new List<Person>();
+    }
+
+    private async void OnClickInsert()
+    {
+        Person person = new()
+            {
+                FirstName = newPerson.FirstName,
+                LastName = newPerson.LastName,
+                EmailAddress = newPerson.EmailAddress
+            };
+
+        await PeopleService.SavePerson(person);
+        
+        personList = await PeopleService.GetAllPeople();
+
+        newPerson = new();
+    }
+
+}

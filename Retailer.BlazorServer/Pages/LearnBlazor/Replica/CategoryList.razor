@@ -1,0 +1,122 @@
+﻿@page "/category/categoryList"
+@inject ICategoryManager _coreManager
+@inject IJSRuntime _jsRuntime
+
+
+<div class="row mt-4">
+    <div class="col-6">
+        <h4 class="card-title text-primary">Category List</h4>
+
+        @if (IsLoading)
+        {
+            <div class="text-center">
+                <img src="images/loading.gif">
+            </div>
+        }
+        else
+        {
+            if (categoryList.Any())
+            {
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>CreatedDate</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <Virtualize Context="category" Items="categoryList">
+                            <tr>
+                                <td class="w-25">@category.Name</td>
+                                <td class="w-25">@category.CreatedDate</td>
+                                <td>
+                                    <NavLink class="nav-link btn-success text-center text-light m-1" href="@($"category/edit/{category.Id}")">Edit</NavLink>
+                                    <NavLink class="nav-link btn-danger text-center text-light m-1" @onclick="() => HandleDelete(category.Id)">Delete</NavLink>
+                                </td>
+
+                            </tr>
+                        </Virtualize>
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>There is no records</p>
+            }
+        }
+
+    </div>
+
+    <div class="col-4 offset-2">
+        <a href="category/create" class="btn btn-primary form-control">Add new category</a>
+    </div>
+</div>
+
+<_DeleteConfirmation IsParentComponentProcessing="IsLoading"
+                     CloseDeletePopUp_Parent="CloseDeletePopUp" DeleteCategory_Parent="DeleteCategory">
+</_DeleteConfirmation>
+
+@code {
+    private List<CategoryDto> categoryList = new();
+
+    public int DeleteCategoryId { get; set; }
+
+    private bool IsLoading { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadCategories();
+        }
+    }
+
+
+    private async Task LoadCategories()
+    {
+        IsLoading = true;
+        StateHasChanged();
+
+        categoryList = await _coreManager.GetAllCategories();
+
+        IsLoading = false;
+        StateHasChanged();
+    }
+
+    private async void DeleteCategory()
+    {
+        IsLoading = true;
+
+        if (DeleteCategoryId > 0)
+        {
+            await _coreManager.DeleteCategory(DeleteCategoryId);
+
+            await _jsRuntime.ToastrSuccess("Category Deleted");
+
+            await LoadCategories();
+
+            StateHasChanged();
+        }
+        else
+        {
+            await _jsRuntime.ToastrFailed("Category Failed");
+        }
+
+        IsLoading = false;
+        StateHasChanged();
+
+        await CloseDeletePopUp();
+    }
+
+    private async Task HandleDelete(int id)
+    {
+        DeleteCategoryId = id;
+        await _jsRuntime.InvokeVoidAsync("ShowDeleteConfirmationModel");
+    }
+
+    private async Task CloseDeletePopUp()
+    {
+        await _jsRuntime.InvokeVoidAsync("HideDeleteConfirmationModel");
+    }
+}

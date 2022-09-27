@@ -1,0 +1,160 @@
+﻿@page "/grpcCustomer"
+@inject IGrpcClient _grpcClient
+@inject IJSRuntime _jsRuntime
+@inject ICustomerManager _customerManager
+<h3>GrpcCustomer</h3>
+
+
+<div class="row">
+    <EditForm Model="customer" OnValidSubmit="AddCustomer">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        <InputText @bind-Value="@customer.FirstName"></InputText>
+        <InputText @bind-Value="@customer.LastName"></InputText>
+        <InputText @bind-Value="@customer.EmailAddress"></InputText>
+        <InputNumber @bind-Value="@customer.Age"></InputNumber>
+        <InputCheckbox @bind-Value="@customer.IsAlive"></InputCheckbox>
+
+        <button type="submit" class="btn btn-primary">Add</button>
+    </EditForm>
+</div>
+@if (IsLoading)
+{
+    <div class="text-center">
+        <img src="images/loading.gif">
+    </div>
+}
+else
+{
+    if (customerList.Count > 0)
+    {
+        <div class="row">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Email</th>
+                        <th>IsAlive</th>
+                        <th>Actions</th>
+                    </tr>
+
+                </thead>
+                <tbody>
+                    <Virtualize Context="Customer" Items="customerList">
+                        <tr>
+                            <td>@Customer.FirstName</td>
+                            <td>@Customer.Age</td>
+                            <td>@Customer.EmailAddress</td>
+                            <td>
+                                <input disabled type="checkbox" checked="@(Customer.IsAlive == true ? "checked" : null)" />
+                            </td>
+                            <td><button class="btn btn-danger" @onclick="()=>ShowConfirmation(Customer.Id)">Delete</button></td>
+                        </tr>
+                    </Virtualize>
+
+
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <span>There is no customer</span>
+    }
+}
+
+
+<_DeleteConfirmation @ref="deleteConfirmation"
+                     ParentDeleteEntity="DeleteCustomer" ParentHideConfirmation="HideConfirmation">
+
+</_DeleteConfirmation>
+
+
+@code {
+    [Parameter]
+    //[SupplyParameterFromQuery]
+    public EventCallback ParentNotifySecondComponent { get; set; }
+
+    private List<CustomerDto> customerList = new();
+
+    private CustomerDto customer { get; set; } = new();
+
+    private int CategoryId { get; set; }
+
+
+    private bool IsLoading { get; set; }
+
+    private _DeleteConfirmation deleteConfirmation;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCustomers();
+    }
+
+    public async Task LoadCustomers()
+    {
+        IsLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            customerList = await _grpcClient.GetAllCustomers();
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+
+        IsLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task AddCustomer()
+    {
+        IsLoading = true;
+        StateHasChanged();
+
+        await _grpcClient.AddCustomer(customer);
+
+        customer = new();
+
+        customerList = await _grpcClient.GetAllCustomers();
+
+        IsLoading = false;
+        StateHasChanged();
+
+        await ParentNotifySecondComponent.InvokeAsync();
+    }
+
+    private async Task DeleteCustomer()
+    {
+        IsLoading = true;
+        StateHasChanged();
+
+        await _customerManager.DeleteCustomer(CategoryId);
+
+        customerList = await _grpcClient.GetAllCustomers();
+
+        await _jsRuntime.InvokeVoidAsync("HideDeleteConfirmationModel");
+
+        IsLoading = false;
+        StateHasChanged();
+
+        await ParentNotifySecondComponent.InvokeAsync();
+    }
+
+    private async Task ShowConfirmation(int id)
+    {
+        CategoryId = id;
+        await deleteConfirmation.ShowModal();
+    }
+
+    private async Task HideConfirmation()
+    {
+        CategoryId = 0;
+        await _jsRuntime.InvokeVoidAsync("HideDeleteConfirmationModel");
+    }
+
+  
+}

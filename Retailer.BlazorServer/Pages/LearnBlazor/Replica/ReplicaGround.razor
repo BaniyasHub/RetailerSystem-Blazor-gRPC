@@ -1,0 +1,113 @@
+﻿@page "/playground/replica"
+@page "/playground/replica/{parameter1}"
+@inject IJSRuntime _jsRuntime
+@inject NavigationManager _navigationManager
+@inject IGrpcClient _grpcClient
+<h3>PlayGround</h3>
+
+<h4> QueryParameter : @QueryParamValue</h4>
+<button class="btn btn-danger" @onclick="FileUpload">File Upload</button>
+
+<div hidden="@(ShowSection == true ? null: "hidden")">
+
+    <span>@SelectedDiv</span>
+
+
+    <br />
+
+    <div>
+        @if (Enabled)
+        {
+            <p>I'm enabled</p>
+        }
+    </div>
+    <span>Count: @Count</span>
+
+    <div>
+        <button class="btn btn-danger" @onclick="LoadParameters">LoadParameters</button>
+        <span>Parameter : @Parameter1</span>
+    </div>
+
+    <div>
+        <input class="form-control" type="text" @bind-value="@TextToOrc" placeholder="Enter" />
+        <button class="btn btn-warning" @onclick="SendTextToOrc">Send</button>
+    </div>
+
+
+</div>
+
+
+<_ReplicaOrc @ref="orcComponent" EventCount="IncreaseCount" EventEnableText="ParentEnableText"
+             EventShowSection="ParentShowSection" EventSelectionOfDiv="ParentSelectionOfDiv">
+
+</_ReplicaOrc>
+
+
+@code {
+    public int QueryParamValue { get; set; }
+
+    public int Count { get; set; }
+
+    public string TextToOrc { get; set; }
+
+    public string SelectedDiv { get; set; }
+
+    public bool ShowSection { get; set; } = true;
+
+    public bool Enabled { get; set; }
+
+    public _ReplicaOrc orcComponent;
+
+    [Parameter]
+    public string Parameter1 { get; set; }
+
+    public async Task LoadParameters()
+    {
+        var absoluteUri = new Uri(_navigationManager.Uri);
+        var queryParam = HttpUtility.ParseQueryString(absoluteUri.Query);
+
+        if (queryParam["queryparam"] != null && queryParam["queryparam"].Count() > 0)
+        {
+            QueryParamValue = int.Parse(queryParam["queryparam"]);
+
+            await _jsRuntime.InvokeVoidAsync("ShowToastr", "success", "Loaded Parameters");
+        }
+
+        await _jsRuntime.ToastrFailed("You need to provide the parameter");
+    }
+
+
+    public void IncreaseCount(int value)
+    {
+        Count += value;
+    }
+
+    public void ParentEnableText()
+    {
+        Enabled = !Enabled;
+    }
+
+
+    public void SendTextToOrc()
+    {
+        orcComponent.TextFromParentMethod(TextToOrc);
+    }
+
+    public void ParentShowSection(bool show)
+    {
+        ShowSection = show;
+    }
+
+    public void ParentSelectionOfDiv(string selectedDiv)
+    {
+        SelectedDiv = selectedDiv;
+    }
+
+
+    public async Task FileUpload()
+    {
+        await _grpcClient.FileUpload();
+
+        await _jsRuntime.ToastrSuccess("File Uploaded");
+    }
+}

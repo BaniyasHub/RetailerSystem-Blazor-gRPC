@@ -1,0 +1,131 @@
+﻿@page "/details/{productId:int}"
+@inject IProductService _productService
+@inject ILocalStorageService _localStorageService
+@inject NavigationManager _navigationManager
+@inject ICartService _cartService
+@inject IJSRuntime _jsRuntime
+@inject IProductGrpcClient _productGrpcClient
+
+<h3>ProductDetails</h3>
+
+@if (isLoading)
+{
+    <div class="text-center">
+        <img src="/images/loading.gif" />
+    </div>
+}
+else
+{
+    <EditForm OnValidSubmit="AddToCart" Model="product">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        <div class="card container mt-4">
+
+            <div class="card-header ml-0  row">
+                <div class="col-12 col-md-6">
+                    <h1 class="text-primary">@product.Name</h1>
+                </div>
+
+                <div class="col-12 col-md-6 text-end pt-4">
+                    <span class="badge bg-info pt-2" style="height:30px;">@product.Category.Name</span>
+                    <span class="badge bg-warning pt-2" style="height:30px;">@product.Color</span>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="container rounded p-2">
+                    <div class="row">
+
+                        <div class="col-10">
+                            <p>@product.Description</p>
+                            <div class="row">
+                                <div class="col-3 bg-light text-center pt-2 m-2" style="border:3px solid #28A745; border-radius:10px;box-shadow:5px">
+                                    <InputSelect class="form-select" @bind-Value="productPriceId">
+                                        <option value="0" disabled="disabled" selected>-- Select a Size</option>
+                                        @foreach (var price in product.ProductPriceList)
+                                        {
+                                        <option value="@price.Id">@price.Size : @price.Price.ToString("c")</option>
+                                        }
+                                </InputSelect>
+                            </div>
+                            <div class="row pl-2">
+                                <div class="col-2 text-primary"><h4>Count</h4></div>
+                                <div class="col-10">
+                                    <InputNumber @bind-Value="quantity" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-2">
+                        <img src="@product.ImageUrl" width="100%" class="rounded" />
+                    </div>
+
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-12 col-md-6 pb-1">
+                        <a class="btn btn-success form-control " href="/">Back to Home</a>
+                    </div>
+                    <div class="col-12 col-md-6 pb-1">
+                        <button type="submit" value="Add to Cart" class="btn btn-primary form-control">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+}
+
+@code {
+    [Parameter]
+    public int productId { get; set; }
+
+    public ProductDto product { get; set; } = new();
+
+    public DetailsVM detailsVM { get; set; } = new();
+
+    public int productPriceId { get; set; }
+
+    public int quantity { get; set; }
+
+    public bool isLoading { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        StateHasChanged();
+
+        product = await _productGrpcClient.GetProductById(productId);
+
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    public async Task AddToCart()
+    {
+        detailsVM.ProductPriceId = productPriceId;
+        detailsVM.ProductPrice = await _productService.GetProductPriceById(productPriceId);
+        detailsVM.Quantity = quantity;
+        detailsVM.Product = product;
+
+        quantity = 0;
+        productPriceId = 0;
+
+        var shoppingCart = new ShoppingCart
+            {
+                ProductId = detailsVM.Product.Id,
+                ProductPriceId = detailsVM.ProductPriceId,
+                Count = detailsVM.Quantity
+            };
+
+        await _cartService.IncrementCart(shoppingCart);
+
+        await _jsRuntime.InvokeVoidAsync("ShowToastr", "success", "Added to the Cart");
+
+        _navigationManager.NavigateTo("/");
+
+
+    }
+}

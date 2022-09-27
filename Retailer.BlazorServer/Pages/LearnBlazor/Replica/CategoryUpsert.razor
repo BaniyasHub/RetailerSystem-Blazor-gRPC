@@ -1,0 +1,97 @@
+﻿@page "/category/create"
+@page "/category/edit/{CategoryId:int}"
+@inject ICategoryManager _coreManager
+@inject NavigationManager _navigationManager
+@inject IJSRuntime _jsRuntime
+
+<div class="row my-2">
+    <h3 class="card-title text-primary mb-3 ml-3">@Title Category</h3>
+
+    <div class="col-12">
+        @if (IsLoading)
+        {
+            <div class="text-center">
+                <img src="images/loading.gif">
+            </div>
+        }
+        else
+        {
+            <EditForm Model="category" OnValidSubmit="UpsertCategory">
+                <DataAnnotationsValidator></DataAnnotationsValidator>
+
+                <InputText class="form-control w-50" id="Name" @bind-Value="category.Name"></InputText>
+                <ValidationMessage For="()=> category.Name"></ValidationMessage>
+                <InputDate class="form-control w-50" id="CreationDate" @bind-Value="category.CreatedDate"></InputDate>
+
+                <button type="submit" class="btn btn-outline-danger">Submit</button>
+                <button type="button" class="btn btn-outline-danger" @onclick="BackToIndex">Back</button>
+            </EditForm>
+        }
+
+    </div>
+</div>
+
+
+
+@code {
+
+    [Parameter]
+    public int CategoryId { get; set; }
+
+    public string Title { get; set; } = "Create";
+
+    private CategoryDto category = new();
+
+    public bool IsLoading { get; set; } = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (CategoryId < 1)
+            {
+                IsLoading = false;
+            }
+            else
+            {
+                Title = "Edit";
+
+                await LoadCategory();
+            }
+        }
+    }
+
+    public async Task LoadCategory()
+    {
+        IsLoading = true;
+        StateHasChanged();
+
+        category = await _coreManager.GetCategory(CategoryId);
+
+        IsLoading = false;
+        StateHasChanged();
+    }
+
+    public async Task UpsertCategory()
+    {
+        if (CategoryId >= 1)
+        {
+            await _coreManager.UpdateCategory(category);
+            await _jsRuntime.ToastrSuccess("Category Updated");
+        }
+        else
+        {
+            await _coreManager.AddCategory(category);
+            category = new CategoryDto();
+            _navigationManager.NavigateTo("category/categoryList");
+            await _jsRuntime.ToastrSuccess("Category Created");
+        }
+
+    }
+
+    public void BackToIndex()
+    {
+        _navigationManager.NavigateTo("category/categoryList");
+    }
+
+}

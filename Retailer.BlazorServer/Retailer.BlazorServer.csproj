@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="GrpcClient\Protos\customer.proto" />
+    <None Remove="GrpcClient\Protos\file.proto" />
+    <None Remove="GrpcClient\Protos\Greet.proto" />
+    <None Remove="GrpcClient\Protos\productV2.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="11.0.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.21.6" />
+    <PackageReference Include="Grpc.AspNetCore.Server.ClientFactory" Version="2.48.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.48.0" />
+    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.48.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.48.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.9">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.9" />
+    <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Retailer.Business\Retailer.Business.csproj" />
+    <ProjectReference Include="..\Retailer.Common\Retailer.Common.csproj" />
+    <ProjectReference Include="..\Retailer.DataAccess\Retailer.DataAccess.csproj" />
+    <ProjectReference Include="..\Retailer.Data\Retailer.Data.csproj" />
+    <ProjectReference Include="..\Retailer.Interface\Retailer.Interface.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="GrpcClient\Protos\customer.proto" GrpcServices="Client" />
+    <Protobuf Include="GrpcClient\Protos\file.proto" GrpcServices="Client" />
+    <Protobuf Include="GrpcClient\Protos\Greet.proto" GrpcServices="Client" />
+    <Protobuf Include="GrpcClient\Protos\productV2.proto" GrpcServices="Client" />
+  </ItemGroup>
+
+</Project>

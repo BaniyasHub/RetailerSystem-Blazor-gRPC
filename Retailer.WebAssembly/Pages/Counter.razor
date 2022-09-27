@@ -1,0 +1,44 @@
+﻿@page "/counter"
+@using Retailer.Interface.Dtos
+@using Retailer.WebAssembly.GrpcClient.Product
+@using Retailer.WebAssembly.Service.IService
+@inject IProductService _productService
+@inject IProductGrpcClient _productGrpcClient
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+
+<p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+<Virtualize Items="productList" Context="product">
+    <span>@product.Name</span>
+    <br />
+</Virtualize>
+
+<br />
+
+<Virtualize Items="productList2" Context="product2">
+    <span>@product2.Name</span>
+    <br />
+</Virtualize>
+
+@code {
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+
+    private List<ProductDto> productList = new();
+    private List<ProductDto> productList2 = new();
+
+    protected async override Task OnInitializedAsync()
+    {
+        productList = await _productService.GetAllProducts();
+        productList2 = await _productGrpcClient.GetAllProducts();
+    }
+}

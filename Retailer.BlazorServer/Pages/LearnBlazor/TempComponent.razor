@@ -1,0 +1,201 @@
+﻿@page "/learnBlazor/tempComponent"
+
+<h2 class="text-danger">Individual Component</h2>
+
+<div class="row">
+    <div class="col-6 border p-3">
+        <h3 class="text-primary">TempComponent Playground</h3>
+
+        <select class="w-50" @bind="@selectedProp">
+            @foreach (var item in @demoProduct.DD_Products)
+            {
+                <option value="@item.Key">@item.Value</option>
+            }
+        </select>
+
+        <input class="form-control w-50" type="number" @bind-value="@demoProduct.Price" @bind-value:event="oninput" />
+
+        <input class="form-check w-50" type="checkbox" @bind-value="@demoProduct.IsActive" checked="@(demoProduct.IsActive ? "checked":null)" />
+    </div>
+
+    <br />
+    <br />
+
+    <div class="col-6 border p-3">
+        <h3 class="text-primary">TempComponent</h3>
+
+        <span class="form-control">Name = @demoProduct.Name</span>
+        <span class="form-control">Price = @demoProduct.Price</span>
+        <span class="form-control">This Product is : @IsActive(@demoProduct)</span>
+        <span class="form-control">This Product is : @(@demoProduct.IsActive == true ? "Active" : "InActive")</span>
+        <span class="form-control">Selected prop : @selectedProp</span>
+        <span class="form-control">
+            @if (!String.IsNullOrEmpty(selectedProp))
+            {
+                <p class="form-control">Selected property value : @demoProduct.DD_Products.FirstOrDefault(x=>x.Key==selectedProp).Value</p>
+            }
+        </span>
+    </div>
+    <br />
+    <br />
+
+</div>
+
+<div class="row border p-3">
+    <h3 class="text-primary">TempComponent Table</h3>
+
+    @foreach (var item in @demoProductList)
+    {
+        <div class="col-5">
+
+            <input class="form-control w-50" type="text" @bind-value="@item.Name" @bind-value:event="oninput" />
+
+        </div>
+
+        <div class="col-5">
+
+            <input class="form-control w-50" type="number" @bind-value="@item.Price" @bind-value:event="oninput" />
+
+        </div>
+
+         <div class="col-2">
+
+            <input class="form-check w-50" type="checkbox" @bind-value="@item.IsActive" checked="@(item.IsActive == true ? "checked":null)" />
+
+        </div>
+    }
+
+</div>
+
+<br />
+<br />
+
+<div class="row border p-3">
+    <h3 class="text-primary">TempComponent Summary</h3>
+
+    @foreach (var item in @demoProductList)
+    {
+        <div class="row">
+            <span class="form-control w-50">@item.Name [@item.Price] is @(item.IsActive == true ? "Active" : "InActive")</span>
+        </div>
+    }
+
+</div>
+
+<br />
+<br />
+
+
+
+@code {
+    private string selectedProp = "";
+
+
+    private List<Demo_Product> demoProductList = new();
+
+    private Demo_Product demoProduct = new();
+
+
+    protected override void OnInitialized()
+    {
+        demoProductList.Add(new Demo_Product()
+            {
+                Id = 1,
+                Name = "Mengerler",
+                IsActive = true,
+                Price = 12.99,
+                DD_Products = new List<Demo_DD_Product>()
+            {
+                new Demo_DD_Product()
+                  {
+                    Id = 1,
+                    Key = "Color",
+                    Value = "Blue"
+                  },
+                new Demo_DD_Product()
+                {
+                    Id = 2,
+                    Key = "Material",
+                    Value = "Steel"
+                },
+
+                new Demo_DD_Product()
+                {
+                    Id = 3,
+                    Key = "Size",
+                    Value = "200"
+                }
+            }
+            });
+
+        demoProductList.Add(new Demo_Product()
+            {
+                Id = 2,
+                Name = "Koç",
+                IsActive = true,
+                Price = 23.35,
+                DD_Products = new List<Demo_DD_Product>()
+            {
+                new Demo_DD_Product()
+                  {
+                    Id = 1,
+                    Key = "Color",
+                    Value = "Purple"
+                  },
+                new Demo_DD_Product()
+                {
+                    Id = 2,
+                    Key = "Material",
+                    Value = "Coal"
+                },
+
+                new Demo_DD_Product()
+                {
+                    Id = 3,
+                    Key = "Size",
+                    Value = "300"
+                }
+            }
+            });
+
+        demoProductList.Add(new Demo_Product()
+            {
+                Id = 3,
+                Name = "Sabancı",
+                IsActive = false,
+                Price = 35.77,
+                DD_Products = new List<Demo_DD_Product>()
+            {
+                new Demo_DD_Product()
+                  {
+                    Id = 1,
+                    Key = "Color",
+                    Value = "Red"
+                  },
+                new Demo_DD_Product()
+                {
+                    Id = 2,
+                    Key = "Material",
+                    Value = "Sun"
+                },
+
+                new Demo_DD_Product()
+                {
+                    Id = 3,
+                    Key = "Size",
+                    Value = "400"
+                }
+            }
+            });
+
+        demoProduct = demoProductList.FirstOrDefault(x => x.Id == 1);
+    }
+
+    private string IsActive(Demo_Product demoP)
+    {
+        return demoProduct.IsActive == true ? "Active" : "Inactive";
+    }
+
+}
+
+

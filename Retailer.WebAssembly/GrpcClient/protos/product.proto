@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+option csharp_namespace = "Retailer.WebAssembly.GrpcClient.Protos";
+
+package product;
+
+service Product{
+	rpc GetAllProducts (GetAllProductsRequest) returns (stream ProductModel);
+    rpc GetProductById (GetProductByIdRequest) returns (ProductModel);
+    rpc GetProductsByIds (stream GetProductByIdRequest) returns(ProductModelList);
+    rpc GetStreamProductsByIds (stream GetProductByIdRequest) returns(stream ProductModel);
+}
+
+message GetAllProductsRequest{
+	
+}
+
+message GetProductByIdRequest{
+    int32 id = 1;
+}
+
+message ProductModel{
+    int32 id = 1;
+    string name = 2;
+    string description = 3;
+    bool shopFavorites = 4;
+    bool customerFavorites = 5;
+    string color = 6;
+    string imageUrl = 7;
+    int32 categoryId = 8;
+    CategoryModel category = 9;
+}
+
+message CategoryModel{
+    int32 id = 1;
+    string name = 2;
+}
+
+message ProductModelList{
+    repeated ProductModel ProductModel = 1;
+}
+
+

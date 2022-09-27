@@ -1,0 +1,125 @@
+﻿using AutoMapper;
+using Retailer.Business.Filters;
+using Retailer.Data.Models;
+using Retailer.DataAccess.Repository.IRepository;
+using Retailer.Interface.Dtos;
+using Retailer.Interface.Interfaces.Managers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Retailer.Business.Managers
+{
+    public class ProductManager : IProductManager
+    {
+        private readonly IRepositoryFactory _repositoryFactory;
+        private readonly IMapper _mapper;
+
+        public ProductManager(IRepositoryFactory repositoryFactory, IMapper mapper)
+        {
+            _repositoryFactory = repositoryFactory;
+            _mapper = mapper;
+        }
+
+        public async Task<List<ProductDto>> GetAllProducts()
+        {
+            var productList = await _repositoryFactory.ProductRepository.FindMany(ProductBy.All(), includePaths: new string[] { "Category", "ProductPriceList" });
+            var productDtoList = _mapper.Map<List<ProductDto>>(productList);
+
+            return productDtoList;
+        }
+
+        public async Task<ProductDto> GetProduct(int id)
+        {
+            var product = await _repositoryFactory.ProductRepository.FindOne(ProductBy.Id(id), includeProperties: new string[] { "Category", "ProductPriceList" });
+            var productDto = _mapper.Map<ProductDto>(product);
+
+            return productDto;
+        }
+
+        public async Task AddProduct(ProductDto productDto)
+        {
+            var product = _mapper.Map<Product>(productDto);
+
+            await _repositoryFactory.ProductRepository.Add(product);
+            await _repositoryFactory.ProductRepository.SaveChanges();
+        }
+
+        public async Task DeleteProduct(int id)
+        {
+            var product = await _repositoryFactory.ProductRepository.FindOne(ProductBy.Id(id));
+
+            await _repositoryFactory.ProductRepository.Delete(product);
+            await _repositoryFactory.ProductRepository.SaveChanges();
+        }
+
+        public async Task UpdateProduct(ProductDto productDto)
+        {
+            var productEntity = await _repositoryFactory.ProductRepository.FindOne(ProductBy.Id(productDto.Id));
+
+            if (productEntity != null)
+            {
+                productEntity.Name = productDto.Name;
+                productEntity.Description = productDto.Description;
+                productEntity.ShopFavorites = productDto.ShopFavorites;
+                productEntity.CustomerFavorites = productDto.CustomerFavorites;
+                productEntity.Color = productDto.Color;
+                productEntity.CategoryId = productDto.CategoryId;
+                productEntity.ImageUrl = productDto.ImageUrl;
+
+                await _repositoryFactory.ProductRepository.SaveChanges();
+            }
+        }
+
+        public async Task<List<ProductDto>> GetProductsByIds(List<int> ids)
+        {
+            var productList = await _repositoryFactory.ProductRepository.FindMany(ProductBy.ProductIds(ids), includePaths: "Category");
+
+            var productDtoList = _mapper.Map<List<ProductDto>>(productList);
+
+            return productDtoList;
+        }
+
+        public async Task DeleteProductPriceById(int id)
+        {
+            var productPrice = await _repositoryFactory.ProductPriceRepository.FindOne(x => x.Id == id);
+
+            await _repositoryFactory.ProductPriceRepository.Delete(productPrice);
+            await _repositoryFactory.ProductPriceRepository.SaveChanges();
+        }
+
+        public async Task EditProductPrice(ProductPriceDto productPrice)
+        {
+            var productPriceEntity = await _repositoryFactory.ProductPriceRepository.FindOne(x => x.Id == productPrice.Id);
+
+            if (productPriceEntity != null)
+            {
+                productPriceEntity.Price = productPrice.Price;
+                productPriceEntity.Size = productPrice.Size;
+            }
+
+            await _repositoryFactory.ProductPriceRepository.SaveChanges();
+        }
+
+        public async Task AddProductPrice(ProductPriceDto productPrice)
+        {
+            var productPriceEntity = _mapper.Map<ProductPrice>(productPrice);
+
+            await _repositoryFactory.ProductPriceRepository.Add(productPriceEntity);
+            await _repositoryFactory.ProductPriceRepository.SaveChanges();
+        }
+
+        public async Task<ProductPriceDto> GetProductPriceById(int id)
+        {
+            var productPriceEntity = await _repositoryFactory.ProductPriceRepository.FindOne(x => x.Id == id, includeProperties: "Product");
+
+            var productPriceDto = _mapper.Map<ProductPriceDto>(productPriceEntity);
+
+            return productPriceDto;
+        }
+
+
+    }
+}

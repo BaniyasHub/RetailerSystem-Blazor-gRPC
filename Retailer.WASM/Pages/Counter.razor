@@ -1,0 +1,69 @@
+﻿@*@page "/counter/{startCount:int?}"*@
+@page "/counter/{startString?}"
+@page "/counter/test/{*customRoute}" 
+@inject IProductService _productService
+@inject IProductGrpcClient _grpcClient
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+<br />
+Custom Route : @CustomRoute
+<br />
+<input @ref="Input" />
+<br />
+<p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+<Virtualize Items="productList" Context="product">
+    <span>@product.Name</span>
+    <br />
+</Virtualize>
+
+<br />
+<input @ref="Input2" />
+
+
+
+@code {
+    [Parameter]
+    public int? StartCount { get; set; }
+
+    [Parameter]
+    public string StartString { get; set; }
+
+    [Parameter]
+    public int? CustomRoute { get; set; }   //It overrides the other matching parameters
+
+    private int currentCount = 0;
+
+    private async Task IncrementCount()
+    {
+        currentCount++;
+        if (currentCount % 2 == 0)
+        {
+            await Input.FocusAsync();
+        }
+        else
+        {
+            await Input2.FocusAsync();
+        }
+
+    }
+
+    public ElementReference Input { get; set; }
+    public ElementReference Input2 { get; set; }
+
+    private List<ProductDto> productList = new();
+    private List<ProductDto> productList2 = new();
+
+    protected async override Task OnInitializedAsync()
+    {
+        productList = await _productService.GetAllProducts();
+
+        productList = productList.Take(^2..).ToList();
+        productList2 = await _grpcClient.GetAllProducts();
+
+    }
+}

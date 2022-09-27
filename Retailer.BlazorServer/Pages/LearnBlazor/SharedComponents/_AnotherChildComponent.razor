@@ -1,0 +1,14 @@
+﻿<div>
+    <h4 class="text-primary pt-3">_AnotherChildComponent</h4>
+    <input id="name" @attributes="@AttributeSplatting" />
+
+</div>
+
+
+
+@code {
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> AttributeSplatting { get; set; } = new();
+
+
+}

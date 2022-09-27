@@ -1,0 +1,104 @@
+﻿@inject IJSRuntime _JsRuntime;
+
+<h3>_ChildComponent</h3>
+
+<div>
+    <div @onclick="(args)=> InnerChangeSelectedDivOnChild(args,DummyText1)" class="alert alert-info">@Title</div>
+    <div @onclick="(args)=> InnerChangeSelectedDivOnChild(args,DummyText2)" class="alert alert-success">
+
+        <input type="checkbox" @onchange="(args)=>SelectionOfChildEvent(args)" />
+        <div>
+            @if (ChildContent != null)
+            {
+                <span>@DangerContent</span>
+            }
+            else
+            {
+                <span>Hello from empty danger render fragment </span>
+            }
+        </div>
+
+        <div>
+            @if (DangerContent != null)
+            {
+                <span>@DangerContent</span>
+            }
+            else
+            {
+                <span>Hello from empty child render fragment </span>
+            }
+        </div>
+
+        <div>
+            @if (FirstRenderFragment != null && SecondRenderFragment != null)
+            {
+                <span>Fragments from parent : @FirstRenderFragment , @SecondRenderFragment</span>
+            }
+        </div>
+
+    </div>
+
+    <button class="btn btn-danger" @onclick="OnButtonClick">Button to be clicked</button>
+
+    <_GrandChildComponent>
+
+    </_GrandChildComponent>
+
+</div>
+
+
+
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+
+    public string DummyText1 { get; set; } = "first";
+
+    public string DummyText2 { get; set; } = "second";
+
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public RenderFragment DangerContent { get; set; }
+
+    [Parameter]
+    public RenderFragment FirstRenderFragment { get; set; }
+
+    [Parameter]
+    public RenderFragment SecondRenderFragment { get; set; }
+
+
+    [Parameter]
+    public EventCallback OnButtonClick { get; set; }
+
+    [Parameter]
+    public EventCallback<string> ChangeSelectedDivOnChild { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> SelectionOfChild { get; set; }
+
+
+    public async Task InnerChangeSelectedDivOnChild(MouseEventArgs args, string title)
+    {
+        await ChangeSelectedDivOnChild.InvokeAsync(title);
+    }
+
+    public async Task InnerChangeSelectedDivOnChildCheckBox(ChangeEventArgs args, string title)
+    {
+        await ChangeSelectedDivOnChild.InvokeAsync(title);
+    }
+
+    public async Task SelectionOfChildEvent(ChangeEventArgs e)
+    {
+        await SelectionOfChild.InvokeAsync((bool)e.Value);
+    }
+
+    public async Task ToastrSuccess()
+    {
+        await _JsRuntime.ToastrSuccess("Success");
+    }
+
+}

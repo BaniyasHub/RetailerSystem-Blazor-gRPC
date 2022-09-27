@@ -1,0 +1,81 @@
+﻿<h3>OrcMinion</h3>
+
+
+<button class="btn btn-secondary" @onclick="()=>TriggerCounterFromOrc(100)">
+    Trigger Parent Count
+</button>
+
+
+<button class="btn btn-secondary" @onclick="EnableTextFromOrc">
+    Enable Parent Text
+</button>
+
+<div>
+    <p>@TextFromParent</p>
+</div>
+
+<div>
+    <input type="checkbox" checked="checked" @onchange="(args)=>ChildShowSection(args)"/>
+</div>
+
+<div @onclick="()=>ChildSelectionOfDiv(Text1)">
+    dummy1
+</div>
+
+<div @onclick="()=>ChildSelectionOfDiv(Text2)">
+    dummy2
+</div>
+
+<div @onclick=" ()=>ChildSelectionOfDiv(Text3)">
+    dummy3
+</div>
+
+@code {
+    public string TextFromParent { get; set; }
+
+    public string Text1 = "FirstDiv";
+    public string Text2 = "SecondDiv";
+    public string Text3 = "ThirdDiv";
+
+    [Parameter]
+    public EventCallback<string> EventSelectionOfDiv { get; set; }
+
+    [Parameter]
+    public EventCallback<int> EventCount { get; set; }
+
+    [Parameter]
+    public EventCallback EventEnableText { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> EventShowSection { get; set; }
+
+
+
+
+    public async Task TriggerCounterFromOrc(int value)
+    {
+        await EventCount.InvokeAsync(value);
+    }
+
+    public async Task EnableTextFromOrc()
+    {
+        await EventEnableText.InvokeAsync();
+    }
+
+    public void TextFromParentMethod(string text)
+    {
+        TextFromParent = text;
+    }
+
+    public async Task ChildSelectionOfDiv(string selectedDiv)
+    {
+        await EventSelectionOfDiv.InvokeAsync(selectedDiv);
+    }
+
+    public async Task ChildShowSection(ChangeEventArgs e)
+    {
+        await EventShowSection.InvokeAsync((bool)e.Value);
+    }
+
+  
+}

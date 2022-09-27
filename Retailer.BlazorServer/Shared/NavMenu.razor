@@ -1,0 +1,127 @@
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Retailer.BlazorServer</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="playground/replica">
+                <span class="oi oi-sun" aria-hidden="true"></span> Blazor WarHall
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="category/replicaCategoryList">
+                <span class="oi oi-laptop" aria-hidden="true"></span> Category List
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="product/productList">
+                <span class="oi oi-beaker" aria-hidden="true"></span> Product List
+            </NavLink>
+        </div>
+
+          <div class="nav-item px-3">
+            <NavLink class="nav-link" href="grpcCustomer">
+                <span class="oi oi-yen" aria-hidden="true"></span> Customer List
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" @onclick="()=>expandMenu = !expandMenu">
+                <span class="oi oi-pie-chart" aria-hidden="true"></span> <span class="text-light">Expand Menu</span> 
+            </NavLink>
+        </div>
+
+
+        @if (expandMenu)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <span class="oi oi-home" aria-hidden="true"></span> Home
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="learnBlazor/tempcomponent">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Bind prop
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="learnBlazor/demoproduct">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Show product
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="learnBlazor/parentcomponent">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Parent-Child Relation
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="learnBlazor/routing/learnRouting">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Learn Routing
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="learnBlazor/blazorJs/learnBlazorJs">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Learn BlazorJs
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="learnBlazor/blazorLifeCycle/lifeCycle">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Learn LifeCycle
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="category/categoryList">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> CategoryList
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="grpcDemo">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> GrpcDemo
+                </NavLink>
+            </div>
+
+
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="replica/lifeCycle">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> replicaLifeCycle
+                </NavLink>
+            </div>
+
+        }
+
+
+    </nav>
+</div>
+
+@code {
+
+    public bool expandMenu { get; set; }
+
+    private bool collapseNavMenu = true;
+
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+}

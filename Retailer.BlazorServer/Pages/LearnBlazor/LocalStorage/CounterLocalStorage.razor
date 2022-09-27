@@ -1,0 +1,45 @@
+﻿@page "/CounterLocalStorage"
+@inject ProtectedLocalStorage _localStorage
+@inject ProtectedSessionStorage _sessionStorage
+
+<h3>CounterLocalStorage</h3>
+
+<p>
+    Current Count : @currentCount   
+</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click Me</button>
+
+
+@code {
+    public int currentCount { get; set; }
+
+    public List<string> stringList{ get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var result = await _localStorage.GetAsync<int>("CounterLocalStorage.currentCount");
+
+        currentCount = result.Success ? result.Value : 0;
+
+        if (firstRender)
+        {
+            StateHasChanged();
+        }
+        //var x = stringList ?? new List<string>();
+
+    }
+
+    public async Task IncrementCount()
+    {
+        currentCount++;
+        await _localStorage.SetAsync("CounterLocalStorage.currentCount",currentCount);
+    }
+
+
+    //Local storage saves value even if browser is closed unlike session storage
+    //Local storage >> User Machine , Session Storage >> Specific Tab
+    //OnAfterRender is safe to use with them
+    //Their values are encrypted
+}
+

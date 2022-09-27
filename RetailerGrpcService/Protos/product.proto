@@ -1,0 +1,95 @@
+syntax = "proto3";
+
+
+import "google/protobuf/duration.proto";  
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/any.proto";
+
+package product.v1;
+
+service Product{
+	rpc GetAllProducts (GetAllProductsRequest) returns (stream ProductModel);
+    rpc GetProductById (GetProductByIdRequest) returns (ProductModel);
+    rpc GetProductsByIds (stream GetProductByIdRequest) returns(ProductModelList);
+    rpc GetProductPriceListById (GetProductPriceByIdRequest) returns(stream ProductPriceModel);
+    rpc GetStreamProductsByIds (stream GetProductByIdRequest) returns(stream ProductModel);
+    rpc GetWisdomModel (GetWisdomModelRequest) returns(TempProductMessage);
+    rpc BiDirectionalExampleMethod (stream BiDirectionalRequest) returns(stream BiDirectionalResponse);
+}
+
+
+message BiDirectionalRequest{
+	string biDirectionalMessage = 1;
+}
+
+message BiDirectionalResponse{
+	string biDirectionalResponseMessage = 1;
+}
+
+
+message GetAllProductsRequest{
+	
+}
+
+message GetProductPriceByIdRequest{
+    int32 id = 1;
+}
+
+message GetWisdomModelRequest{
+    string wish = 1;
+}
+
+message GetProductByIdRequest{
+    int32 id = 1;
+}
+
+message ProductModel{
+    int32 id = 1;
+    string name = 2;
+    string description = 3;
+    bool shopFavorites = 4;
+    bool customerFavorites = 5;
+    string color = 6;
+    string imageUrl = 7;
+    int32 categoryId = 8;
+    CategoryModel category = 9;
+    repeated ProductPriceModel productPriceList = 10;
+}
+
+message ProductPriceModel{
+    int32 id = 1;
+    int32 productId = 2;
+    string size =  4;
+    double price = 5;
+}
+
+message CategoryModel{
+    int32 id = 1;
+    string name = 2;
+}
+
+message ProductModelList{
+    repeated ProductModel productModel = 1;
+}
+
+message TempProductMessage{
+    double doubleType = 1;
+    int32 int32Type = 2;
+    google.protobuf.Int32Value nullableInt32Type = 3;
+    int64 int64Type = 4;
+    string stringType = 5;
+    repeated string stringListType = 6;
+    bool boolType = 7;
+    bytes byteListType = 8;
+    CategoryModel categoryModel = 9;
+    map<string, string> dictionaryModel = 10;
+    google.protobuf.Duration durationType = 11;
+    google.protobuf.Timestamp timeStampType = 12;
+    google.protobuf.Any anyType = 13;
+    oneof result {
+        GetProductByIdRequest requestModel = 14;
+        GetAllProductsRequest allRequestModel = 15;
+    }
+}
+

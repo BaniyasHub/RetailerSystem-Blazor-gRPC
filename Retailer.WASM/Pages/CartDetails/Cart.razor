@@ -1,0 +1,191 @@
+﻿@page "/cart"
+@using Retailer.Common.Utility
+@inject IProductService _productService
+@inject ILocalStorageService _localStorageService
+@inject NavigationManager _navigationManager
+@inject ICartService _cartService
+@inject IJSRuntime _jsRuntime
+
+<h3>Cart</h3>
+
+@if (isProcessing)
+{
+    <div class="text-center">
+        <img src="/images/loading.gif" />
+    </div>
+}
+else
+{
+    @if (!shoppingCarts.Any())
+    {
+        <div>
+            Please add product to shopping cart.
+        </div>
+    }
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header bg-dark text-light ml-0 ">
+                <div class="row">
+                    <div class="col-6  pt-2">
+                        Shopping Cart
+                    </div>
+                    <div class="col-6 col-md-3 offset-md-3 text-end">
+                        <a href="/" class="btn btn-outline-info form-control">Continue Shopping</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                @foreach (var shoppingCart in shoppingCarts)
+                {
+                    <div class="row">
+                        <div class="col-3 col-md-1 text-center py-2">
+                            <img src="@shoppingCart.Product.ImageUrl" class="rounded" width="100%" />
+                        </div>
+                        <div class="col-9 text-sm-center text-md-start col-md-4 pt-lg-1 ">
+                            <h4><strong>@shoppingCart.Product.Name</strong></h4>
+
+                            <div class="badge bg-primary text-center" style="font-size:12px;">
+                                @shoppingCart.Product.Category.Name
+                            </div>
+                            <div class="badge bg-info text-center" style="font-size:12px;">
+                                @shoppingCart.Product.Color
+                            </div>
+                            <div><p>Size : @shoppingCart.ProductPrice.Size</p></div>
+                        </div>
+                        <div class="col-12 text-sm-center col-md-7 text-md-start row  pt-lg-3 mt-3">
+                            <div class="col-4 pt-1 ">
+
+                                <h6><strong>@shoppingCart.ProductPrice.Price.ToString("c") <span class="text-muted">x</span> @shoppingCart.Count </strong></h6>
+                            </div>
+                            <div class="col-6 col-sm-4 col-lg-6">
+                                <button @onclick="()=>AdditionToCart(shoppingCart.ProductPriceId)" type="submit" class="btn btn-primary">
+                                    <i class="bi bi-plus-square"></i>
+                                </button>
+                                <button @onclick="()=>DecrementCart(shoppingCart.ProductPriceId)" type="submit" class="btn btn-warning">
+                                    <i class="bi bi-dash-square"></i>
+                                </button>
+                            </div>
+                            <div class="col-2 col-sm-4 col-lg-2 text-right">
+                                <button @onclick="()=>DeleteCart(shoppingCart.ProductPriceId)" type="submit" class="btn btn-outline-danger">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+
+                <hr />
+
+                <div class="row">
+                    <div class="col-12 col-md-5">
+                    </div>
+                    <div class="col-12 col-md-6 offset-md-1 col-lg-4 offset-lg-3 pr-4">
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex justify-content-between bg-light">
+                                <span class="text-info"> Total (USD)</span>
+                                <strong class="text-info">@orderTotal.ToString("c")</strong>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="card-footer">
+                <div class="col-12  col-md-3 offset-md-9">
+                    <a href="/summary" class="btn btn-secondary form-control">Summary</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    public bool isProcessing { get; set; }
+
+    private List<ShoppingCart> shoppingCarts { get; set; } = new();
+
+    private List<ProductDto> productList { get; set; } = new();
+
+    public double orderTotal { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        await LoadCart();
+    }
+
+    public async Task LoadCart()
+    {
+        isProcessing = true;
+        StateHasChanged();
+        orderTotal = 0;
+        shoppingCarts = await _localStorageService.GetItemAsync<List<ShoppingCart>>(SD.ShoppingCart);
+
+        productList = await _productService.GetAllProducts();
+
+        if (shoppingCarts == null)
+        {
+            shoppingCarts = new List<ShoppingCart>();
+        }
+
+        foreach (var shoppingCart in shoppingCarts)
+        {
+            shoppingCart.Product = productList.FirstOrDefault(x => x.Id == shoppingCart.ProductId);
+            shoppingCart.ProductPrice = shoppingCart.Product.ProductPriceList.FirstOrDefault(x => x.Id == shoppingCart.ProductPriceId);
+            orderTotal += shoppingCart.ProductPrice.Price * shoppingCart.Count;
+        }
+
+        isProcessing = false;
+        StateHasChanged();
+    }
+
+    public async Task AdditionToCart(int productPriceId)
+    {
+        var shoppingCart = shoppingCarts.FirstOrDefault(x => x.ProductPriceId == productPriceId);
+
+        await _cartService.IncrementCart(new ShoppingCart
+            {
+                ProductId = shoppingCarts.FirstOrDefault(x => x.ProductPriceId == productPriceId).ProductId,
+                ProductPriceId = productPriceId,
+                Count = 1
+            });
+
+        await LoadCart();
+
+    }
+
+    public async Task DecrementCart(int productPriceId)
+    {
+        var shoppingCart = shoppingCarts.FirstOrDefault(x => x.ProductPriceId == productPriceId);
+
+        await _cartService.DecrementCart(new ShoppingCart
+            {
+                ProductId = shoppingCarts.FirstOrDefault(x => x.ProductPriceId == productPriceId).ProductId,
+                ProductPriceId = productPriceId,
+                Count = 1
+            });
+
+        await LoadCart();
+
+    }
+
+    public async Task DeleteCart(int productPriceId)
+    {
+        var shoppingCart= shoppingCarts.FirstOrDefault(x => x.ProductPriceId == productPriceId);
+
+        for (int i = 0; i < shoppingCart.Count; i++)
+        {
+            await _cartService.DecrementCart(new ShoppingCart
+            {
+                ProductId = shoppingCart.ProductId,
+                ProductPriceId = productPriceId,
+                Count = 1
+            });
+        }
+       
+
+        await LoadCart();
+
+    }
+}

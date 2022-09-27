@@ -1,0 +1,156 @@
+﻿@page "/product/price/{productId:int}"
+@using Retailer.Common.Utility
+@inject IGrpcClient _grpcClient
+@inject NavigationManager _navigationManager
+@inject IJSRuntime _jsRuntime
+@inject IProductManager _productManager
+@inject ICategoryManager _categoryManager
+
+
+<h3 class="card-title text-primary mb-3 ml-3">Product Price Management</h3>
+
+@if (isLoading)
+{
+    <div class="text-center">
+        <img src="images/loading.gif">
+    </div>
+}
+else
+{
+    <div class="row border p-2 mb-4">
+
+        <div class="col-10">
+            <div class="card-body">
+                <h4>@product.Name</h4>
+                Category: <span>@product.Category.Name</span>
+                <br />
+                Description: <span>@product.Description</span>
+                <br />
+
+            </div>
+        </div>
+
+        <div class="col-1">
+            <img src="@product.ImageUrl" class="w-100">
+        </div>
+
+        <div class="col-1">
+            <button class="btn btn-success" @onclick="()=>AddProductPrice(product.Id)">Add</button>
+            <button class="btn btn-dark pt-2 mt-2" @onclick="()=>BackToProducts()">Back</button>
+        </div>
+
+    </div>
+
+}
+
+@if (isLoading)
+{
+    <div class="text-center">
+        <img src="images/loading.gif">
+    </div>
+}
+else
+{
+    if (product.ProductPriceList.Count > 0)
+    {
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Size</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <Virtualize Items="product.ProductPriceList" Context="productPrice">
+                    <tr>
+                        <td>@productPrice.Id</td>
+                        <td>@productPrice.Size</td>
+                        <td>@productPrice.Price</td>
+                        <td>
+                            <button class="btn btn-primary" @onclick="()=>EditProductPrice(productPrice.Id)">Edit</button>
+                            <button class="btn btn-danger" @onclick="()=>DeleteConfirmation(productPrice.Id)">Delete</button>
+                        </td>
+                    </tr>
+                </Virtualize>
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <span>There is no price for this product</span>
+    }
+
+}
+
+<_DeleteConfirmation @ref="deleteConfirmationComponent" ParentDeleteEntity="DeleteProductPrice" ParentHideConfirmation="HideModal">
+
+</_DeleteConfirmation>
+
+@code {
+    [Parameter]
+    public int productId { get; set; }
+
+    public ProductDto product { get; set; }
+
+    public int productPriceId { get; set; }
+
+    public bool isLoading { get; set; } = true;
+
+    public _DeleteConfirmation deleteConfirmationComponent { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        isLoading = true;
+        StateHasChanged();
+
+        product = await _productManager.GetProduct(productId);
+
+        isLoading = false;
+        StateHasChanged();
+    }
+
+
+    public void EditProductPrice(int id)
+    {
+        _navigationManager.NavigateTo($"productPricing/Upsert/{productId}/{id}");
+    }
+
+    public void AddProductPrice(int id)
+    {
+        _navigationManager.NavigateTo($"productPricing/Upsert/{productId}");
+    }
+
+    public async Task DeleteProductPrice()
+    {
+        await _productManager.DeleteProductPriceById(productPriceId);
+        await HideModal();
+        isLoading = true;
+        StateHasChanged();
+
+        product = await _productManager.GetProduct(productId);
+
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    public async Task HideModal()
+    {
+        await _jsRuntime.InvokeVoidAsync("HideDeleteConfirmationModel");
+    }
+
+    public async Task DeleteConfirmation(int id)
+    {
+        productPriceId = id;
+
+        await deleteConfirmationComponent.ShowModal();
+    }
+
+    public async Task BackToProducts()
+    {
+        _navigationManager.NavigateTo("product/productList");
+    }
+
+}

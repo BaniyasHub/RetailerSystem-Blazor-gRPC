@@ -1,0 +1,50 @@
+﻿@page "/replica/lifeCycle"
+
+<h3>ReplicaLifeCycle</h3>
+
+<p role="status">Current Count : @currentCount</p>
+<hr />
+<button class="btn btn-primary" @onclick="IncrementCount">Click Me</button>
+
+
+<Virtualize Items="eventType" Context="theEvent">
+    @theEvent
+    <hr />
+
+</Virtualize>
+
+<br />
+<br />
+<br />
+
+<_ReplicaLifeCycleChild CurrentCount="currentCount">
+
+
+</_ReplicaLifeCycleChild>
+
+
+@code {
+    private int currentCount { get; set; }
+
+    private List<string> eventType = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        eventType.Add("OnInitializedAsync is called");
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        eventType.Add("OnParametersSetAsync is called");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        eventType.Add("OnAfterRenderAsync is called");
+    }
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+}
