@@ -1,1 +1,2 @@
 # Retailer
+Retailer.GrpcService >> ResourcesAndNotes
