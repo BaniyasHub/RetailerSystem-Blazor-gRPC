@@ -21,10 +21,6 @@ namespace Retailer.BlazorServer.GrpcClient.Clients
 
         Task<List<ProductDto>> GetStreamProductByIds(List<int> ids = null);
 
-        Task FileUpload();
-
-        Task FileDownload();
-
         Task<WisdomDto> GetWisdomModel();
 
         Task BiDirectionalExample();

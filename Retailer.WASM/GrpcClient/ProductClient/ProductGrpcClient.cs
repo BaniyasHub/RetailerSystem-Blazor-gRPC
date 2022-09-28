@@ -13,7 +13,7 @@ namespace Retailer.WASM.GrpcClient.ProductClient
         private readonly IConfiguration _configuration;
         private readonly Product.V1.Product.ProductClient _productGrpcClient;
 
-        public ProductGrpcClient( IMapper mapper, GrpcClientFactory grpcClientFactory, IConfiguration configuration)
+        public ProductGrpcClient(IMapper mapper, GrpcClientFactory grpcClientFactory, IConfiguration configuration)
         {
             _mapper = mapper;
             _configuration = configuration;
@@ -33,13 +33,49 @@ namespace Retailer.WASM.GrpcClient.ProductClient
         {
             var productList = new List<ProductModel>();
 
-            var response = _productGrpcClient.GetAllProducts(new GetAllProductsRequest());
+            var cts = new CancellationTokenSource();
+            var token = cts.Token;
 
-            while (await response.ResponseStream.MoveNext())
+            //Deadline will be valid on all retries, also if we are calling a server which calls another Grpc Server >>
+            //>>EnableCallContextPropagation() method can be used when registering Client
+            var response = _productGrpcClient.GetAllProducts(new GetAllProductsRequest(), cancellationToken: token, deadline: DateTime.UtcNow.AddSeconds(10));
+            try
             {
-                var product = response.ResponseStream.Current;
-                product.ImageUrl = _configuration.GetSection("BaseServerUrl").Value + product.ImageUrl;
-                productList.Add(product);
+                //We can run background tasks in client while processing response messages
+                //var task2 = Task.Run(async () =>
+                //{
+                //    for (int i = 0; i < 50; i++)
+                //    {
+                //        productList.Add(new ProductModel());
+                //       await Task.Delay(2000);
+                //    }
+                //});
+
+                var task1 = Task.Run(async () =>
+                {
+                    while (await response.ResponseStream.MoveNext())
+                    {
+                        var product = response.ResponseStream.Current;
+
+                        //Along with the situations like deadline and retry exceptions we can raise the Token manually to inform the server to abort the call ASAP
+                        //if (product.Name == "Mustafa")
+                        //{
+                        //    cts.Cancel();
+                        //}
+
+                        product.ImageUrl = _configuration.GetSection("BaseServerUrl").Value + product.ImageUrl;
+                        productList.Add(product);
+                    }
+                });
+
+
+                await task1;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+
+                return new List<ProductDto>();
             }
 
             var productDtoList = _mapper.Map<List<ProductDto>>(productList);
@@ -51,4 +87,4 @@ namespace Retailer.WASM.GrpcClient.ProductClient
 
 
 
-    
+

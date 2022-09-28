@@ -9,7 +9,6 @@ using Retailer.BlazorServer.GrpcClient.Protos;
 using Retailer.Interface.Dtos;
 using System.Net;
 using System.Threading.Tasks;
-using FileInfo = Retailer.BlazorServer.GrpcClient.Protos.FileInfo;
 using HttpVersion = System.Net.HttpVersion;
 
 namespace Retailer.BlazorServer.GrpcClient.Clients
@@ -166,53 +165,8 @@ namespace Retailer.BlazorServer.GrpcClient.Clients
             return _mapper.Map<List<ProductDto>>(productModelList);
         }
 
-        public async Task FileDownload()
-        {
-            var client = new FileGreeter.FileGreeterClient(channel);
 
-            var response = client.FileDownload(new FileInfo { FileName = "fw", FileExtension = ".pdf" });
-
-            while (await response.ResponseStream.MoveNext())
-            {
-
-            }
-        }
-
-        public async Task FileUpload()
-        {
-            var client = new FileGreeter.FileGreeterClient(channel);
-
-            //string path = Path.Combine(_webHostEnvironment.WebRootPath, "files");
-            //using FileStream fileStream = new FileStream($"{path}/InvoicePdf.pdf", FileMode.Open);
-            using FileStream fileStream = new FileStream(@"C:\Users\MUSSUYI\source\repos\Retailer\Retailer.BlazorServer\wwwroot\files\InvoicePdf.pdf", FileMode.Open);
-            var bytesContent = new BytesContent()
-            {
-                FileSize = fileStream.Length,
-                ReadedByte = 0,
-                FileInfo = new FileInfo()
-                {
-                    FileName = Path.GetFileNameWithoutExtension(fileStream.Name),
-                    FileExtension = Path.GetExtension(fileStream.Name)
-                }
-
-            };
-
-            var response = client.FileUpload();
-            byte[] buffer = new byte[2048];
-
-            while ((bytesContent.ReadedByte = await fileStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
-            {
-                bytesContent.Buffer = ByteString.CopyFrom(buffer);
-                await response.RequestStream.WriteAsync(bytesContent);
-            }
-            await response.RequestStream.CompleteAsync();
-
-            fileStream.Close();
-
-            await response.ResponseAsync;
-        }
-
-
+        //Created for seeing proto types and which ones can be automatically converted to c# types with automapper
         public async Task<WisdomDto> GetWisdomModel()
         {
             var response = await _productClientV2.GetWisdomModelAsync(new GetWisdomModelRequest { Wish = "Howdy" });

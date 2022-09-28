@@ -3,15 +3,22 @@
 Registering Grpc Client with Configuration
 ---------------------------------------------------
 **builder.Services
-    .AddGrpcClient<Product.ProductClient>("ProductAuthenticated", o =>
+    .AddGrpcClient<Product.V1.Product.ProductClient>("ProductAuthenticated", x =>
         {
-            o.Address = new Uri("http://localhost:5251");
-        }).ConfigurePrimaryHttpMessageHandler(
-        () => new GrpcWebHandler(new HttpClientHandler()));
+            x.Address = new Uri("http://localhost:7042");
+        })
+    .ConfigureChannel(x =>
+        {
+            x.HttpHandler = grpcWebHandler;
+            x.ServiceConfig = new ServiceConfig()
+            {
+                MethodConfigs =
+                {
+                    retryMethodConfig
+                }
+            };
+        });
 
-	//AddingInterceptor
-	//ConfiguringChannel
-	//AddingCallCredentials
 
 Initiating the Client
 ---------------------------------------------------
@@ -19,7 +26,7 @@ private readonly Greeter.GreeterClient _client;
 
     public AggregatorService(GrpcClientFactory grpcClientFactory)
     {
-        _client = grpcClientFactory.CreateClient<Greeter.GreeterClient>("GreeterAuthenticated");
+        _greeterClient = grpcClientFactory.CreateClient<Greeter.GreeterClient>("GreeterAuthenticated");
     }
 
 
@@ -33,7 +40,8 @@ If server streaming is not used in your app then GrpcWeb is recommended because 
 
 We have three steps that we can manipulate the client:
 
-HttpMessageHandler >> HttpClientHandler >> GrpcWebHandler has significant options as messageHandler:
+1/HttpMessageHandler >> HttpClientHandler >> GrpcWebHandler has significant options as messageHandler:
+-----------------------------------------------------------------------------------------------------------
     //  MaxConnectionsPerServer = 200,
     //  AllowAutoRedirect = true,
     //  UseProxy = true,    
@@ -44,12 +52,16 @@ HttpMessageHandler >> HttpClientHandler >> GrpcWebHandler has significant option
     //  InnerHandler
     //  GrpcWebMode
         
-We pass this handler to GrpcChannel and it has:
+
+2/We pass this handler to GrpcChannel and it has:
+---------------------------------------------------
     // x.HttpHandler = grpcWebHandler;  >>> These two can't be assigned at the same time
     // x.HttpClient = httpClient;       >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     // x.ServiceConfig = new ServiceConfig() { MethodConfigs = { retryMethodConfig } }; //Retry and Hedging Policy
 
-We are creating GrpcClient with these channel and this Client has:
+
+3/We are creating GrpcClient with these channel and this Client has:
+---------------------------------------------------------------------
     //  x.Address = new Uri("http://localhost:7042");
     //  x.Interceptors.Add()
 

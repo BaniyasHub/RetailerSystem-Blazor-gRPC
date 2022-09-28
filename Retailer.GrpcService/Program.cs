@@ -15,7 +15,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddGrpc(options => {
-    options.EnableDetailedErrors = true;
     options.MaxReceiveMessageSize = 2 * 1024 * 1024; // 2 MB
     options.MaxSendMessageSize = 5 * 1024 * 1024; // 5 MB
     options.EnableDetailedErrors = true;
@@ -46,7 +45,6 @@ var app = builder.Build();
 
 
 //Configure the HTTP request pipeline.
-
 app.UseRouting();
 
 
@@ -60,7 +58,6 @@ app.UseCors();
 app.MapGrpcService<GreeterService>().EnableGrpcWeb().RequireCors("AllowAll");
 app.MapGrpcService<CustomerService>().EnableGrpcWeb().RequireCors("AllowAll");
 app.MapGrpcService<ProductServiceV1>().EnableGrpcWeb().RequireCors("AllowAll");
-app.MapGrpcService<FileService>().EnableGrpcWeb().RequireCors("AllowAll");
 
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 

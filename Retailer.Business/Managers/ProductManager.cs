@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Retailer.Business.Filters;
 using Retailer.Data.Models;
 using Retailer.DataAccess.Repository.IRepository;
@@ -23,12 +24,23 @@ namespace Retailer.Business.Managers
             _mapper = mapper;
         }
 
-        public async Task<List<ProductDto>> GetAllProducts()
+        //Cancellation condition put temporary, it will be refactored to situation it's can't be null
+        public async Task<List<ProductDto>> GetAllProducts(CancellationToken? cancellationToken = null)
         {
             var productList = await _repositoryFactory.ProductRepository.FindMany(ProductBy.All(), includePaths: new string[] { "Category", "ProductPriceList" });
-            var productDtoList = _mapper.Map<List<ProductDto>>(productList);
 
-            return productDtoList;
+            var productEntityList = new List<Product>();
+
+            if (cancellationToken != null)
+            {
+                productEntityList = await productList.ToListAsync((CancellationToken)cancellationToken);
+                var productDtoList1 = _mapper.Map<List<ProductDto>>(productEntityList);
+                return productDtoList1;
+
+            }
+            var productDtoList2 = _mapper.Map<List<ProductDto>>(productList);
+
+            return productDtoList2;
         }
 
         public async Task<ProductDto> GetProduct(int id)

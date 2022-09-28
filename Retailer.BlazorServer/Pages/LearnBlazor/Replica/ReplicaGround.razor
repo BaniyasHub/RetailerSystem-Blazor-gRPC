@@ -6,7 +6,6 @@
 <h3>PlayGround</h3>
 
 <h4> QueryParameter : @QueryParamValue</h4>
-<button class="btn btn-danger" @onclick="FileUpload">File Upload</button>
 
 <div hidden="@(ShowSection == true ? null: "hidden")">
 
@@ -103,11 +102,5 @@
         SelectedDiv = selectedDiv;
     }
 
-
-    public async Task FileUpload()
-    {
-        await _grpcClient.FileUpload();
-
-        await _jsRuntime.ToastrSuccess("File Uploaded");
-    }
+    
 }

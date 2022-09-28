@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <None Remove="GrpcClient\protos\customer.proto" />
-    <None Remove="GrpcClient\protos\file.proto" />
     <None Remove="GrpcClient\protos\greet.proto" />
     <None Remove="GrpcClient\protos\product.proto" />
   </ItemGroup>
@@ -44,9 +43,6 @@
 
   <ItemGroup>
     <Protobuf Include="GrpcClient\protos\customer.proto">
-      <GrpcServices>Client</GrpcServices>
-    </Protobuf>
-    <Protobuf Include="GrpcClient\protos\file.proto">
       <GrpcServices>Client</GrpcServices>
     </Protobuf>
     <Protobuf Include="GrpcClient\protos\greet.proto">

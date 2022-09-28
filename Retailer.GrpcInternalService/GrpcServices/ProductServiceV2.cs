@@ -102,6 +102,7 @@ namespace Retailer.GrpcInternalService.GrpcServices
             }
         }
 
+        //Created for seeing proto types and which ones can be automatically converted to c# types with automapper
         public async override Task<TempProductMessage> GetWisdomModel(GetWisdomModelRequest request, ServerCallContext context)
         {
             var tempModel = new TempProductMessage();

@@ -2,19 +2,35 @@
 @inject IGrpcClient _grpcClient
 @inject IJSRuntime _jsRuntime
 @inject ICustomerManager _customerManager
-<h3>GrpcCustomer</h3>
+<h3>Grpc Customer @sequence</h3>
 
 
 <div class="row">
     <EditForm Model="customer" OnValidSubmit="AddCustomer">
         <DataAnnotationsValidator></DataAnnotationsValidator>
-        <InputText @bind-Value="@customer.FirstName"></InputText>
-        <InputText @bind-Value="@customer.LastName"></InputText>
-        <InputText @bind-Value="@customer.EmailAddress"></InputText>
-        <InputNumber @bind-Value="@customer.Age"></InputNumber>
-        <InputCheckbox @bind-Value="@customer.IsAlive"></InputCheckbox>
-
-        <button type="submit" class="btn btn-primary">Add</button>
+        <div class="form-group">
+            <label>FirstName</label>
+            <InputText class="form-check" @bind-Value="customer.FirstName"></InputText>
+        </div>
+        <div class="form-group">
+            <label>LastName</label>
+            <InputText class="form-check" @bind-Value="customer.LastName"></InputText>
+        </div>
+        <div class="form-group">
+            <label>EmailAddress</label>
+            <InputText class="form-check" @bind-Value="customer.EmailAddress"></InputText>
+        </div>
+        <div class="form-group">
+            <label>Age</label>
+            <InputNumber class="form-check" @bind-Value="customer.Age"></InputNumber>
+        </div>
+        <div class="form-group">
+            <label>IsAlive</label>
+            <InputCheckbox class="form-check" @bind-Value="customer.IsAlive"></InputCheckbox>
+        </div>
+        <div class="form-control py-2">
+            <button type="submit" class="btn btn-primary">Add</button>
+        </div>
     </EditForm>
 </div>
 @if (IsLoading)
@@ -40,9 +56,10 @@ else
 
                 </thead>
                 <tbody>
+
                     <Virtualize Context="Customer" Items="customerList">
                         <tr>
-                            <td>@Customer.FirstName</td>
+                            <td>@($"{Customer.FirstName} {Customer.LastName}")</td>
                             <td>@Customer.Age</td>
                             <td>@Customer.EmailAddress</td>
                             <td>
@@ -81,10 +98,12 @@ else
 
     private int CategoryId { get; set; }
 
-
     private bool IsLoading { get; set; }
 
     private _DeleteConfirmation deleteConfirmation;
+
+    [Parameter]
+    public int sequence { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -156,5 +175,5 @@ else
         await _jsRuntime.InvokeVoidAsync("HideDeleteConfirmationModel");
     }
 
-  
+
 }

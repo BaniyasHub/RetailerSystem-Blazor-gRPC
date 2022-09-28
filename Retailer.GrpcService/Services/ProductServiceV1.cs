@@ -20,18 +20,33 @@ namespace Retailer.GrpcService.Services
             _mapper = mapper;
         }
 
+        //In scenarios like deadline exceed or any case where client abort the http request we need to pass CancellationToken to commit the call quickly
+        //Also if client cancel the call for some reason we can either throw or put a condition to stop the stream
         public override async Task GetAllProducts(GetAllProductsRequest request, IServerStreamWriter<ProductModel> responseStream, ServerCallContext context)
         {
-            var productDtoList = await _productManager.GetAllProducts();
+            var productDtoList = await _productManager.GetAllProducts(context.CancellationToken);
 
             var productModelList = _mapper.Map<List<ProductModel>>(productDtoList);
 
-            foreach (var productModel in productModelList)
+            try
             {
-                await responseStream.WriteAsync(productModel);
+                foreach (var productModel in productModelList)
+                {
+                    //context.CancellationToken.ThrowIfCancellationRequested();
+                    if (!context.CancellationToken.IsCancellationRequested)
+                    {
+                        await responseStream.WriteAsync(productModel, context.CancellationToken);
+                    }
+                }
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
         }
 
+        //Created for seeing proto types and which ones can be automatically converted to c# types with automapper
         public override async Task<TempProductMessage> GetWisdomModel(GetWisdomModelRequest request, ServerCallContext context)
         {
             var tempModel = new TempProductMessage();
@@ -39,8 +54,10 @@ namespace Retailer.GrpcService.Services
             await Task.Run(() =>
              {
                  //Dictionary
-                 var dictionaryModel = new Dictionary<string, string>();
-                 dictionaryModel.Add("Mustafa", "Suyi");
+                 var dictionaryModel = new Dictionary<string, string>
+                 {
+                     { "Mustafa", "Suyi" }
+                 };
                  tempModel.DictionaryModel.Add(dictionaryModel);
              });
 

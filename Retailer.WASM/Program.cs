@@ -68,15 +68,16 @@ var grpcWebHandler = new GrpcWebHandler(new HttpClientHandler()
     //UseDefaultCredentials = true,
 });
 
+
 //Adding GrpcClient
 builder.Services
     .AddGrpcClient<Customer.Customer.CustomerClient>("CustomerAuthenticated", x =>
-    {
-        x.Address = new Uri("http://localhost:7042");
-        //x.Interceptors.Add()
-    })
+        {
+            x.Address = new Uri("http://localhost:7042");
+            //x.Interceptors.Add()
+        })
     .ConfigurePrimaryHttpMessageHandler(() => grpcWebHandler);
-
+    
 
 builder.Services
     .AddGrpcClient<Product.V1.Product.ProductClient>("ProductAuthenticated", x =>

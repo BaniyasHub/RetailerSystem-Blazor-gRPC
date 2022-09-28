@@ -9,7 +9,7 @@ namespace Retailer.Interface.Interfaces.Managers
 {
     public interface IProductManager
     {
-        Task<List<ProductDto>> GetAllProducts();
+        Task<List<ProductDto>> GetAllProducts(CancellationToken? cancellationToken = null);
 
         Task<ProductDto> GetProduct(int id);
 

@@ -8,13 +8,11 @@
 
   <ItemGroup>
     <None Remove="Protos\customer.proto" />
-    <None Remove="Protos\file.proto" />
     <None Remove="Protos\product.proto" />
   </ItemGroup>
 
   <ItemGroup>
     <Protobuf Include="Protos\customer.proto" GrpcServices="Server" />
-    <Protobuf Include="Protos\file.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\greet.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\product.proto" GrpcServices="Server" />
   </ItemGroup>
