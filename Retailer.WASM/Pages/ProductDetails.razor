@@ -84,8 +84,6 @@ else
 
     public ProductDto product { get; set; } = new();
 
-    public DetailsVM detailsVM { get; set; } = new();
-
     public int productPriceId { get; set; }
 
     public int quantity { get; set; }
@@ -105,19 +103,11 @@ else
 
     public async Task AddToCart()
     {
-        detailsVM.ProductPriceId = productPriceId;
-        detailsVM.ProductPrice = await _productService.GetProductPriceById(productPriceId);
-        detailsVM.Quantity = quantity;
-        detailsVM.Product = product;
-
-        quantity = 0;
-        productPriceId = 0;
-
         var shoppingCart = new ShoppingCart
             {
-                ProductId = detailsVM.Product.Id,
-                ProductPriceId = detailsVM.ProductPriceId,
-                Count = detailsVM.Quantity
+                ProductId = product.Id,
+                ProductPriceId = productPriceId,
+                Count = quantity
             };
 
         await _cartService.IncrementCart(shoppingCart);
@@ -126,6 +116,7 @@ else
 
         _navigationManager.NavigateTo("/");
 
-
+        quantity = 0;
+        productPriceId = 0;
     }
 }
