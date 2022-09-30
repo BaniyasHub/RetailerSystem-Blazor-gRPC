@@ -1,7 +1,7 @@
 
 
 Registering Grpc Client with Configuration
----------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 **builder.Services
     .AddGrpcClient<Product.V1.Product.ProductClient>("ProductAuthenticated", x =>
         {
@@ -18,21 +18,27 @@ Registering Grpc Client with Configuration
                 }
             };
         });
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
 
 
 Initiating the Client
----------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 private readonly Greeter.GreeterClient _client;
 
     public AggregatorService(GrpcClientFactory grpcClientFactory)
     {
         _greeterClient = grpcClientFactory.CreateClient<Greeter.GreeterClient>("GreeterAuthenticated");
     }
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 
 
 Registering GrpcClient
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 After registering GrpcClients in IOC, we can reuse the channel by using GrpcClientFactory, this will create different clients from same channel. (Channel is expensive)
 In order to send request from Client Apps to Grpc Services we need to use GrpcWebHandler as the message handler of the channel.
 While creating GrpcWebHandler we should select GrpcWebText as GrpcWebMode because server streaming requires it. 
@@ -64,5 +70,5 @@ We have three steps that we can manipulate the client:
 ---------------------------------------------------------------------
     //  x.Address = new Uri("http://localhost:7042");
     //  x.Interceptors.Add()
-
+    ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 

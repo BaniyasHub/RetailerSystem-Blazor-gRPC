@@ -1,24 +1,51 @@
-﻿A component's name must start with an uppercase character.
+﻿------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+A component's name must start with an uppercase character.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-Directives: Change the way component markup is parsed or functions. 
-	For example, the @page directive specifies a routable component with a route template and can be reached directly by a user's request in the browser at a specific URL.
-
-Directive attributes: Change the way a component element is parsed or functions. For example, the @bind directive attribute for an <input> element binds data to the element's value.
-
-
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 The @inherits directive is used to specify a base class for a component.
 This enables a component can inherit a base class to provide the component's properties and methods.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Providing initial values for component parameters is supported, but don't create a component that writes to its own parameters after the component is rendered for the first time.
+Our general guidance is not to create components that directly write to their own parameters after the component is rendered for the first time.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Component parameters should be declared as auto-properties, meaning that they shouldn't contain custom logic in their get or set accessors. 
-
 Writing an initial value to a component parameter is supported because initial value assignments don't interfere with the Blazor's automatic component rendering. 
-
 Apply the [EditorRequired] attribute to specify a required component parameter. If a parameter value isn't provided, editors or build tools may display warnings to the user. 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 The property receiving the RenderFragment content must be named ChildContent by convention.
-
 Event callbacks aren't supported for RenderFragment.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+If StateHasChanged is called in a parent component, the Blazor framework rerenders child components if their parameters might have changed:
+For a group of parameter types that Blazor explicitly checks, Blazor rerenders a child component if it detects that any of the parameters have changed.
+For unchecked parameter types, Blazor rerenders the child component regardless of whether or not the parameters have changed. 
+Child content falls into this category of parameter types because child content is of type RenderFragment, which is a delegate that refers to other mutable objects.
+
+<Expander Expanded="true">
+    Expander 1 content
+</Expander>
+
+<Expander Expanded="true" />
+
+The first Expander component sets child content in a potentially mutable RenderFragment.
+Therefore a call to StateHasChanged in the parent component automatically rerenders the component and potentially overwrites the value of Expanded to its intitial value of true.
+
+The second Expander component doesn't set child content. Therefore, a potentially mutable RenderFragment doesn't exist.
+A call to StateHasChanged in the parent component doesn't automatically rerender the child component, so the component's Expanded value isn't overwritten.
+
+To maintain state in the preceding scenario, use a private field in the Expander component to maintain its toggled state.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

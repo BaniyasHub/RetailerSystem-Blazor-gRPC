@@ -1,4 +1,6 @@
-﻿<Router AppAssembly="@typeof(Program).Assembly">
+﻿
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<Router AppAssembly="@typeof(Program).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
     </Found>
@@ -6,7 +8,10 @@
         <p>Sorry, there's nothing at this address.</p>
     </NotFound>
 </Router>
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 When a Razor file with an @page directive is compiled, the generated class is given a RouteAttribute specifying the route template. 
 At runtime, the router searches for component classes with a RouteAttribute and renders whichever component has a route template that matches the requested URL.
 When the app starts, the assembly specified as the Router's AppAssembly is scanned to gather route information for the app's components that have a RouteAttribute.
@@ -16,9 +21,13 @@ Receives the RouteData from the Router along with any route parameters.
 Renders the specified component with its layout, including any further nested layouts.
 Optionally specify a DefaultLayout parameter with a layout class for components that don't specify a layout with the @layout directive. 
 The framework's Blazor project templates specify the MainLayout component (Shared/MainLayout.razor) as the app's default layout. 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Components support multiple route templates using multiple @page directives. The following example component loads on requests for /blazor-route and /different-blazor-route.
 string is the default route constraint and valid if no other constraint specified
 @page "/user/{Id:int}/{Option:bool?}" we can use optional parameters like this
 For the URL /catch-all/this/is/a/test with a route template of /catch-all/{*pageRoute}, the value of PageRoute is set to this/is/a/test.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

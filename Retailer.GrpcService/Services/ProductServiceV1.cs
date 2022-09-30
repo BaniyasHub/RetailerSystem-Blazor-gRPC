@@ -46,7 +46,7 @@ namespace Retailer.GrpcService.Services
 
         }
 
-        //Created for seeing proto types and which ones can be automatically converted to c# types with automapper
+        //Created for seeing which proto types can be automatically converted to C# types with automapper
         public override async Task<TempProductMessage> GetWisdomModel(GetWisdomModelRequest request, ServerCallContext context)
         {
             var tempModel = new TempProductMessage();
@@ -84,7 +84,7 @@ namespace Retailer.GrpcService.Services
             });
             tempModel.StringType = "Mustafa Suyi";
 
-            //And and OneOf
+            //Any & OneOf
             tempModel.AnyType = Any.Pack(new ProductModel() { Color = "Blue" });
             tempModel.RequestModel = new GetProductByIdRequest() { Id = 1 };
             tempModel.AllRequestModel = new GetAllProductsRequest();
