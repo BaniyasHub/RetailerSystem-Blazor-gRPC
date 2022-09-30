@@ -9,5 +9,7 @@ namespace Retailer.WASM.GrpcClient.ProductClient
         Task<List<ProductDto>> GetAllProducts();
 
         //Task<ProductPriceDto> GetProductPriceById(int id);
+
+        Task<List<ProductDto>> GetProductsByIds(List<int> productIds);
     }
 }

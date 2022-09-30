@@ -20,21 +20,6 @@ namespace Retailer.WASM.Service
         {
             var cartList = await _localStorageService.GetItemAsync<List<ShoppingCart>>(SD.ShoppingCart);
 
-            //for (int i = 0; i < cartList.Count; i++)
-            //{
-            //    if (cartList[i].ProductId == cartToDecrement.ProductId && cartList[i].ProductPriceId == cartToDecrement.ProductPriceId)
-            //    {
-            //        if (cartList[i].Count == 1 || cartList[i].Count == 0)
-            //        {
-            //            cartList.Remove(cartList[i]);
-            //        }
-            //        else
-            //        {
-            //            cartList[i].Count -= 1;
-            //        }
-            //    }
-            //}
-
             var shoppingCart = cartList.FirstOrDefault(x => x.ProductId == cartToDecrement.ProductId && x.ProductPriceId == cartToDecrement.ProductPriceId);
 
             if (shoppingCart?.Count > 0)

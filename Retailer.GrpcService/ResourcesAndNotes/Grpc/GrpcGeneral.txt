@@ -2,7 +2,7 @@ Grpc ToDo
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Investigate Grpc Documents//
 Investigate HTTP Documents//
-Search CORS
+Search CORS grpc exposed headers types
 Proxy Problems?
 WriteAsync ThreadSafe?
 Ping for sleeping connections?
@@ -17,6 +17,7 @@ Use GrpcClient and GrpcServer configurations to learn their use cases
 Is there any difference about awaiting the Grpc call and GrpcCall.ResponseAsync
 How to receive GrpcWeb and Grpc call in one server
 Implement unit testing from docs
+GrpcWeb works, but how?
 
 
 

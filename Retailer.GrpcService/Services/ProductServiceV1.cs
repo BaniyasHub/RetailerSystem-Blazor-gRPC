@@ -161,5 +161,28 @@ namespace Retailer.GrpcService.Services
                 await Task.Delay(TimeSpan.FromSeconds(1), context.CancellationToken);
             }
         }
+
+        public override async Task GetProductsByIdsServerStreaming(GetProductsByIdsServerStreamingRequest request, IServerStreamWriter<ProductModel> responseStream, ServerCallContext context)
+        {
+            var productModelList = new List<ProductModel>();
+
+            try
+            {
+                var productDtoList = await _productManager.GetProductsByIds(request.ProductIdList.ToList(), context.CancellationToken);
+
+                productModelList = _mapper.Map<List<ProductModel>>(productDtoList);
+
+                foreach (var productModel in productModelList)
+                {
+                    context.CancellationToken.ThrowIfCancellationRequested();
+                    await responseStream.WriteAsync(productModel);
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+
+        }
     }
 }

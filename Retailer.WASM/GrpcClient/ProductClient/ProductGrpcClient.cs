@@ -82,6 +82,34 @@ namespace Retailer.WASM.GrpcClient.ProductClient
             return productDtoList;
         }
 
+
+        public async Task<List<ProductDto>> GetProductsByIds(List<int> productIds)
+        {
+            var request = new GetProductsByIdsServerStreamingRequest();
+            request.ProductIdList.AddRange(productIds);
+
+            var productList = new List<ProductDto>();
+            var cts = new CancellationTokenSource();
+            var token = cts.Token;
+
+            var response = _productGrpcClient.GetProductsByIdsServerStreaming(request, deadline: DateTime.UtcNow.AddSeconds(15), cancellationToken: token);
+
+            await foreach (var productModel in response.ResponseStream.ReadAllAsync())
+            {
+                productModel.ImageUrl = _configuration.GetSection("BaseServerUrl").Value + productModel.ImageUrl;
+                productList.Add(_mapper.Map<ProductDto>(productModel));
+
+                //Just for convenience
+                if (productModel.Id == 553634)
+                {
+                    cts.Cancel();
+                }
+            }
+
+
+            return productList;
+        }
+
     }
 }
 

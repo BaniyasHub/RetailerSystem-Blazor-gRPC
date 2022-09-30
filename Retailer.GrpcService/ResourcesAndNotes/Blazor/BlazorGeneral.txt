@@ -6,13 +6,14 @@ Learn the usage of @implements IDisposable and @attribute
 Try different Hangfire usages
 Unit and Integration Tests >> Grpc/Blazor >> Retailer.Tests
 Gather Ef Core best practites >>Retailer/DataAccess/Repository
-Learn Route Constraints
+Navigation Manager Methods
 Docker fundamentals
 Web API overview and best practises >> Retailer.WebAPI
 Find the usages of ElementRef-Cascadingparameter-RenderFragment
 Impement JWT and Cookie Authentication & Authorization using built-in components like Authorizeview-AuthorizeRouteView-CascadingAuthenticationState
 Enable client to get data without asking for //Broadcasting with WebSockets & SignalR
-Investigate Routing Terminology
+OnNavigateAsync,Navigating use cases
+
 
 
 
@@ -62,5 +63,4 @@ Investigate Routing Terminology
 	Also new tools like Virtualize, EditForm, InputText etc.
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 

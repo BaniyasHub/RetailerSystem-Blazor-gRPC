@@ -1,0 +1,33 @@
+﻿
+
+message TempProductMessage{
+    double doubleType = 1;
+    int32 int32Type = 2;
+    google.protobuf.Int32Value nullableInt32Type = 3;
+    int64 int64Type = 4;
+    string stringType = 5;
+    repeated string stringListType = 6;
+    bool boolType = 7;
+    bytes byteListType = 8;
+    CategoryModel categoryModel = 9;
+    map<string, string> dictionaryModel = 10;
+    google.protobuf.Duration durationType = 11;
+    google.protobuf.Timestamp timeStampType = 12;
+    google.protobuf.Any anyType = 13;
+    oneof result {
+        GetProductByIdRequest requestModel = 14;
+        GetAllProductsRequest allRequestModel = 15;
+    }
+}
+
+
+These 4 types can't mapped by Automapper and either we map them manually like below or create some extension methods,
+
+    result.TimeStampTypeCustom = response.TimeStampType.ToDateTime();
+    result.DurationTypeCustom = response.DurationType.ToTimeSpan();
+    result.ByteListTypeCustom = response.ByteListType.ToByteArray();
+
+    if (response.AnyType.Is(ProductModel.Descriptor))
+    {
+        result.Product = _mapper.Map<ProductDto>(response.AnyType.Unpack<ProductModel>());
+    }

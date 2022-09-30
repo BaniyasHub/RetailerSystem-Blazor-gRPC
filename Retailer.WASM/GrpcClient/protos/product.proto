@@ -12,12 +12,16 @@ service Product{
 	rpc GetAllProducts (GetAllProductsRequest) returns (stream ProductModel);
     rpc GetProductById (GetProductByIdRequest) returns (ProductModel);
     rpc GetProductsByIds (stream GetProductByIdRequest) returns(ProductModelList);
+    rpc GetProductsByIdsServerStreaming (GetProductsByIdsServerStreamingRequest) returns(stream ProductModel);
     rpc GetProductPriceListById (GetProductPriceByIdRequest) returns(stream ProductPriceModel);
     rpc GetStreamProductsByIds (stream GetProductByIdRequest) returns(stream ProductModel);
     rpc GetWisdomModel (GetWisdomModelRequest) returns(TempProductMessage);
     rpc BiDirectionalExampleMethod (stream BiDirectionalRequest) returns(stream BiDirectionalResponse);
 }
 
+message GetProductsByIdsServerStreamingRequest{
+    repeated int32 productIdList = 1;
+}
 
 message BiDirectionalRequest{
 	string biDirectionalMessage = 1;
@@ -70,7 +74,7 @@ message CategoryModel{
 }
 
 message ProductModelList{
-    repeated ProductModel ProductModel = 1;
+    repeated ProductModel productModel = 1;
 }
 
 message TempProductMessage{

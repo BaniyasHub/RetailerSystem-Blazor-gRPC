@@ -85,9 +85,11 @@ namespace Retailer.Business.Managers
             }
         }
 
-        public async Task<List<ProductDto>> GetProductsByIds(List<int> ids)
+        public async Task<List<ProductDto>> GetProductsByIds(List<int> ids, CancellationToken? cancellationToken = null)
         {
-            var productList = await _repositoryFactory.ProductRepository.FindMany(ProductBy.ProductIds(ids), includePaths: "Category");
+            var productListQuery = await _repositoryFactory.ProductRepository.FindMany(ProductBy.ProductIds(ids), includePaths: new string[] { "Category", "ProductPriceList" });
+
+            var productList = await productListQuery.ToListAsync(cancellationToken: (CancellationToken)cancellationToken);
 
             var productDtoList = _mapper.Map<List<ProductDto>>(productList);
 

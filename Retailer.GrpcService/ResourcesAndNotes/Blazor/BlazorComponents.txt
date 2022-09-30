@@ -1,0 +1,24 @@
+﻿A component's name must start with an uppercase character.
+
+
+Directives: Change the way component markup is parsed or functions. 
+	For example, the @page directive specifies a routable component with a route template and can be reached directly by a user's request in the browser at a specific URL.
+
+Directive attributes: Change the way a component element is parsed or functions. For example, the @bind directive attribute for an <input> element binds data to the element's value.
+
+
+The @inherits directive is used to specify a base class for a component.
+This enables a component can inherit a base class to provide the component's properties and methods.
+
+
+Providing initial values for component parameters is supported, but don't create a component that writes to its own parameters after the component is rendered for the first time.
+
+Component parameters should be declared as auto-properties, meaning that they shouldn't contain custom logic in their get or set accessors. 
+
+Writing an initial value to a component parameter is supported because initial value assignments don't interfere with the Blazor's automatic component rendering. 
+
+Apply the [EditorRequired] attribute to specify a required component parameter. If a parameter value isn't provided, editors or build tools may display warnings to the user. 
+
+The property receiving the RenderFragment content must be named ChildContent by convention.
+
+Event callbacks aren't supported for RenderFragment.

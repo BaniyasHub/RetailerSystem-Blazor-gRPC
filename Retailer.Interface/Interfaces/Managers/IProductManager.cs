@@ -19,7 +19,7 @@ namespace Retailer.Interface.Interfaces.Managers
 
         Task UpdateProduct(ProductDto productDto);
 
-        Task<List<ProductDto>> GetProductsByIds(List<int> ids);
+        Task<List<ProductDto>> GetProductsByIds(List<int> ids, CancellationToken? cancellationToken = null);
 
         Task DeleteProductPriceById(int id);
 

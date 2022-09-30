@@ -2,8 +2,30 @@
 
 <NavMenu />
 
-<div class="main">
-    @Body
+<ErrorBoundary @ref="errorBoundary">
+    <ChildContent>
+        <div class="main">
+            @Body
 
-</div>
+        </div>
+    </ChildContent>
 
+    <ErrorContent>
+        <p class="errorUI">Nothing to see here right now. Sorry!</p>
+    </ErrorContent>
+</ErrorBoundary>
+
+
+@code {
+    private ErrorBoundary? errorBoundary;
+
+    protected override void OnParametersSet()
+    {
+        errorBoundary?.Recover();
+    }
+}
+
+
+@*Because the error boundary is defined in the layout in the preceding examples, the error UI is seen regardless of which page the user navigated to.
+We recommend narrowly scoping error boundaries in most scenarios.
+If you do broadly scope an error boundary, you can reset it to a non-error state on subsequent page navigation events by calling the error boundary's Recover method.*@
