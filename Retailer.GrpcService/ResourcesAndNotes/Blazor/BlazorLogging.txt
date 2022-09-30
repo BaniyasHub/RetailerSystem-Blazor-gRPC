@@ -1,0 +1,4 @@
+﻿
+
+builder.Logging.SetMinimumLevel(LogLevel.Warning);
+

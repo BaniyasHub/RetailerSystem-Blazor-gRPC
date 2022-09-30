@@ -1,51 +1,14 @@
-﻿var vehicleData = new Dictionary<string, string>()
-{
-    { "color", "blue" },
-    { "type", "car" },
-    { "wheels:count", "3" },
-    { "wheels:brand", "Blazin" },
-    { "wheels:brand:type", "rally" },
-    { "wheels:year", "2008" },
-};
+﻿
 
+var vehicleData = new Dictionary<string, string>()
 var memoryConfig = new MemoryConfigurationSource { InitialData = vehicleData };
-
 builder.Configuration.Add(memoryConfig);
 
 
 
-@page "/memory-config"
-@using Microsoft.Extensions.Configuration
-@inject IConfiguration Configuration
-
-<h1>Memory configuration example</h1>
-
-<h2>General specifications</h2>
-
-<ul>
-    <li>Color: @Configuration["color"]</li>
-    <li>Type: @Configuration["type"]</li>
-</ul>
-
-<h2>Wheels</h2>
-
-<ul>
-    <li>Count: @Configuration["wheels:count"]</li>
-    <li>Brand: @Configuration["wheels:brand"]</li>
-    <li>Type: @Configuration["wheels:brand:type"]</li>
-    <li>Year: @Configuration["wheels:year"]</li>
-</ul>
 
 
-
-@code {
-    protected override void OnInitialized()
-    {
-        var wheelsSection = Configuration.GetSection("wheels");
-
-        ...
-    }
-}
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 After the host is built, services are available from the root DI scope before any components are rendered. This can be useful for running initialization logic before rendering content:
 
@@ -63,74 +26,18 @@ await weatherService.InitializeWeatherAsync(
 await host.RunAsync();
 
 
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Some built-in services and their lifecycles in WASM
+
+
 HttpClient			Scoped
 IJSRuntime			Singleton
 NavigationManager	Singleton
 
 Blazor WebAssembly apps don't currently have a concept of DI scopes. Scoped-registered services behave like Singleton services.
 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-
-<script src="_framework/blazor.webassembly.js" autostart="false"></script>
-<script>
-  if (window.location.hostname.includes("localhost")) {
-    Blazor.start({
-      environment: "Staging"
-    });
-  } else {
-    Blazor.start({
-      environment: "Production"
-    });
-  }
-</script>
-
-
-
-
-@page "/read-environment"
-@using Microsoft.AspNetCore.Components.WebAssembly.Hosting
-@inject IWebAssemblyHostEnvironment HostEnvironment
-
-<h1>Environment example</h1>
-
-<p>Environment: @HostEnvironment.Environment</p>    
-
-
-
-
-
-if (builder.HostEnvironment.IsStaging())
-{
-    ...
-};
-
-if (builder.HostEnvironment.IsEnvironment("Custom"))
-{
-    ...
-};
-
-
-
-
-
-
-
-
-builder.Logging.SetMinimumLevel(LogLevel.Warning);
-
-
-currentCount++;
-
-try
-{
-    if (currentCount == 3)
-    {
-        currentCount = 4;
-        throw new OperationCanceledException("Skip 3");
-    }
-}
-catch (Exception ex)
-{
-    logger.LogWarning(ex, "Exception (currentCount: {Count})!", currentCount);
-}

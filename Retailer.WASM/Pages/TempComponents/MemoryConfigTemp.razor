@@ -1,0 +1,29 @@
+﻿@page "/memory-config"
+@inject IConfiguration Configuration
+
+<h1>Memory configuration example</h1>
+
+<h2>General specifications</h2>
+
+<ul>
+    <li>Color: @Configuration["color"]</li>
+    <li>Type: @Configuration["type"]</li>
+</ul>
+
+<h2>Wheels</h2>
+
+<ul>
+    <li>Count: @Configuration["retailers:count"]</li>
+    <li>Brand: @Configuration["retailers:brand"]</li>
+    <li>Type: @Configuration["retailers:brand:type"]</li>
+    <li>Year: @Configuration["retailers:year"]</li>
+</ul>
+
+
+@code {
+    protected override void OnInitialized()
+    {
+        //Can get the section chunks like this
+        var wheelsSection = Configuration.GetSection("retailers");
+    }
+}

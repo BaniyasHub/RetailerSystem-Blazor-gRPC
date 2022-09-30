@@ -1,0 +1,46 @@
+﻿-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+We can set the environment in index.html
+
+<script src="_framework/blazor.webassembly.js" autostart="false"></script>
+<script>
+  if (window.location.hostname.includes("localhost")) {
+    Blazor.start({
+      environment: "Staging"
+    });
+  } else {
+    Blazor.start({
+      environment: "Production"
+    });
+  }
+</script>
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+We can read environment in razor components
+
+@page "/read-environment"
+@using Microsoft.AspNetCore.Components.WebAssembly.Hosting
+@inject IWebAssemblyHostEnvironment HostEnvironment
+
+<h1>Environment example</h1>
+
+<p>Environment: @HostEnvironment.Environment</p>    
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Or in Program.cs...
+
+if (builder.HostEnvironment.IsStaging())
+{
+    ...
+};
+
+if (builder.HostEnvironment.IsEnvironment("Custom"))
+{
+    ...
+};
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+

@@ -7,6 +7,7 @@ using Grpc.Net.Client.Web;
 using Grpc.Net.ClientFactory;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.Extensions.Configuration.Memory;
 using Microsoft.Net.Http.Headers;
 using Retailer.WASM;
 using Retailer.WASM.GrpcClient.ProductClient;
@@ -24,7 +25,7 @@ builder.Services.AddAutoMapper(typeof(WebAssemblyMappingProfile));
 builder.Services.AddBlazoredLocalStorage();
 
 
-//Adding Http Client
+//Adding Http Clients
 builder.Services.AddHttpClient("product", client =>
 {
     client.BaseAddress = new Uri("https://localhost:44304/product");
@@ -36,6 +37,8 @@ builder.Services.AddHttpClient("order", client =>
 
 });
 
+
+//Creating configurations for GrpcClients
 var retryMethodConfig = new MethodConfig
 {
     Names = { MethodName.Default },//Can be configured
@@ -67,7 +70,6 @@ var grpcWebHandler = new GrpcWebHandler(new HttpClientHandler()
     //UseCookies = true,  
     //UseDefaultCredentials = true,
 });
-
 
 //Adding GrpcClient
 builder.Services
@@ -102,8 +104,30 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductGrpcClient, ProductGrpcClient>();
 builder.Services.AddScoped<ICartService, CartService>();
 
-//Building and Running the Client
-await builder.Build().RunAsync();
+//Adding Memory Config
+var retailerData = new Dictionary<string, string>()
+{
+    { "color", "blue" },
+    { "type", "car" },
+    { "retailers:count", "3" },
+    { "retailers:brand", "Blazin" },
+    { "retailers:brand:type", "rally" },
+    { "retailers:year", "2008" },
+};
+var memoryConfig = new MemoryConfigurationSource { InitialData = retailerData };
+builder.Configuration.Add(memoryConfig);
+
+
+
+//Building and Running the WASM
+//await builder.Build().RunAsync();
+
+//We can create a some process behaves like a pipeline by seperating above method
+var host = builder.Build();
+
+
+
+await host.RunAsync();
 
 
 
@@ -120,44 +144,3 @@ await builder.Build().RunAsync();
 
 
 
-
-
-
-
-
-
-
-//client.DefaultRequestHeaders.Add(
-//    HeaderNames.Accept, "application/vnd.github.v3+json");
-//client.DefaultRequestHeaders.Add(
-//    HeaderNames.UserAgent, "HttpRequestsSample");
-
-
-
-//var handler = new GrpcWebHandler(GrpcWebMode.GrpcWebText, new
-//                  HttpClientHandler());
-
-
-
-//.AddInterceptor<Interceptor>(InterceptorScope.Client)
-//.ConfigurePrimaryHttpMessageHandler(() =>
-//    {
-//        var handler = new HttpClientHandler();
-//        return handler;
-//    })
-//.ConfigureChannel(o =>
-//    {
-//        //o.HttpHandler
-//    })
-// .AddCallCredentials((context, metadata) =>
-//     {
-//         if (!string.IsNullOrEmpty("token"))
-//         {
-//             metadata.Add("Authorization", $"Bearer token");
-//         }
-//         return Task.CompletedTask;
-//     });
-
-
-
-//builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.Configuration.GetValue<string>("BaseAPIUrl")) });
