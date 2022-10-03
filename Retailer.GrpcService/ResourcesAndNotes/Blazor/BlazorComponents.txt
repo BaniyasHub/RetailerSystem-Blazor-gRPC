@@ -4,6 +4,12 @@ A component's name must start with an uppercase character.
 
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+A component shouldn't overwritten it's own property with Parameter attribute
+To prevent inconvience might happen because of that, it should use private field to get the parameter value at the first place.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 The @inherits directive is used to specify a base class for a component.
 This enables a component can inherit a base class to provide the component's properties and methods.
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

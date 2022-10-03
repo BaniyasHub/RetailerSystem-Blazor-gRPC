@@ -1,4 +1,4 @@
-﻿@page "/details/{productId:int}"
+﻿@page "/details/{productId:int?}"
 @inject IProductService _productService
 @inject ILocalStorageService _localStorageService
 @inject NavigationManager _navigationManager
@@ -79,7 +79,7 @@ else
 }
 
 @code {
-    [Parameter]
+    [Parameter, EditorRequired]
     public int productId { get; set; }
 
     public ProductDto product { get; set; } = new();

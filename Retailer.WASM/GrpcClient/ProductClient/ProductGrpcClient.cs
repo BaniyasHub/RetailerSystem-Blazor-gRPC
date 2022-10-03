@@ -17,7 +17,7 @@ namespace Retailer.WASM.GrpcClient.ProductClient
         {
             _mapper = mapper;
             _configuration = configuration;
-            _productGrpcClient = grpcClientFactory.CreateClient<Product.V1.Product.ProductClient>("ProductAuthenticated");
+            _productGrpcClient = grpcClientFactory.CreateClient<Product.V1.Product.ProductClient>("ProductClient");
         }
 
         public async Task<ProductDto> GetProductById(int id)

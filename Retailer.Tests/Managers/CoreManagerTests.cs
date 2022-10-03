@@ -36,34 +36,86 @@ namespace Retailer.Tests.Managers
         }
 
         [Test]
-        public async Task GetAllCategories()
+        public async Task GetAllCategories_ReturnTwoCategories()
         {
             _repositoryFactoryMock.CategoryRepositoryMock.Setup(x => x
                 .FindMany(It.IsAny<Expression<Func<Category, bool>>>(), true, It.IsAny<string[]>()))
-                .Returns(GetCategory());
+                .Returns(GetCategoryList());
 
-            await _coreManager.GetAllCategories();
+            var categories = await _coreManager.GetAllCategories();
 
             _repositoryFactoryMock.CategoryRepositoryMock.Verify(x => x
                 .FindMany(It.IsAny<Expression<Func<Category, bool>>>(), true, It.IsAny<string[]>()),
                 Times.AtLeastOnce);
+
+            Assert.That(categories.Count, Is.EqualTo(2));
         }
 
-        private async static Task<IQueryable<Category>> GetCategory()
+        [Test]
+        public async Task GetCategoryById_IdOne_ReturnCategory()
         {
-            var categoryList = new List<Category>
+            var categories = await GetCategoryList();
+            _repositoryFactoryMock.CategoryRepositoryMock.Setup(x => x.FindOne(
+                It.IsAny<Expression<Func<Category, bool>>>(),
+                It.IsAny<bool>(),
+                It.IsAny<string[]>()))
+                .Returns(GetCategory());
+
+            var category = await _coreManager.GetCategory(1);
+
+            _repositoryFactoryMock.CategoryRepositoryMock.Verify(x => x.FindOne(
+                It.IsAny<Expression<Func<Category, bool>>>(),
+                It.IsAny<bool>(),
+                It.IsAny<string[]>()), Times.Once);
+
+            Assert.Multiple(() =>
             {
-                new Category
-                {
-                    Name = "Volvo"
-                },
-               new Category
-                {
-                    Name = "Audi"
-                }
-            };
+                Assert.That(category, Is.Not.Null);
+                Assert.That(category, Is.TypeOf<CategoryDto>());
+                Assert.That(categories, Is.Ordered.By("Id"));
+                Assert.That(category.Name.Count, Is.GreaterThan(1));
+
+                Assert.That(category, Has.Property("Id"));
+                Assert.That(categories, Has.Member(categories.FirstOrDefault()));
+
+                Assert.That(category.Name.ToLower(), Does.StartWith("v"));
+                Assert.That(category.Name.ToLower(), Does.Contain("o"));
+            });
+
+
+        }
+
+        private async static Task<IQueryable<Category>> GetCategoryList()
+        {
+            var categoryList = new List<Category>();
+            var task = Task.Run(() =>
+            {
+                categoryList.AddRange(new List<Category>
+             {
+                 new Category{Name = "Volvo"},
+                 new Category{Name = "Audi"}
+
+             });
+            });
+
+
+            await task;
 
             return categoryList.AsQueryable();
+        }
+
+        private async static Task<Category> GetCategory()
+        {
+            var category = new Category();
+            var task = Task.Run(() =>
+            {
+                category.Name = "Volvo";
+            });
+           
+            await task;
+
+            return category;
+
         }
 
         private MapperConfiguration CreateMapperConfiguration()
@@ -77,3 +129,5 @@ namespace Retailer.Tests.Managers
         }
     }
 }
+
+

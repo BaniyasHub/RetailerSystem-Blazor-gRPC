@@ -80,7 +80,6 @@ else
     }
 }
 
-
 <_DeleteConfirmation @ref="deleteConfirmation"
                      ParentDeleteEntity="DeleteCustomer" ParentHideConfirmation="HideConfirmation">
 
@@ -91,6 +90,12 @@ else
     [Parameter]
     //[SupplyParameterFromQuery]
     public EventCallback ParentNotifySecondComponent { get; set; }
+
+    [CascadingParameter(Name = "message")]
+    public int tempMessage { get; set; }
+
+    [CascadingParameter(Name = "luckyNumber")]
+    public int randomNumber { get; set; }
 
     private List<CustomerDto> customerList = new();
 

@@ -7,8 +7,16 @@
 <ErrorBoundary>
 
     <ChildContent>
-        <GrpcCustomer sequence="1" ParentNotifySecondComponent="NotifySecondComponent">
-        </GrpcCustomer>
+        @*Used cascading parameter just for experiment*@
+        <CascadingValue Name="message" Value="123" IsFixed="true">
+            <CascadingValue Value="7" Name="luckyNumber">
+
+                <GrpcCustomer sequence="1" ParentNotifySecondComponent="NotifySecondComponent">
+                </GrpcCustomer>
+
+            </CascadingValue>
+        </CascadingValue>
+
     </ChildContent>
 
     <ErrorContent>

@@ -1,0 +1,15 @@
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Client-side load balancing is a feature that allows gRPC clients to distribute load optimally across available servers. 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Client-side load balancing is configured when a channel is created. The two components to consider when using load balancing:
+
+The resolver, which resolves the addresses for the channel. Resolvers support getting addresses from an external source. This is also known as service discovery.
+The load balancer, which creates connections and picks the address that a gRPC call will use.
+
+Built-in implementations of resolvers and load balancers are included in Grpc.Net.Client. Load balancing can also be extended by writing custom resolvers and load balancers.
+Addresses, connections and other load balancing state is stored in a GrpcChannel instance. A channel must be reused when making gRPC calls for load balancing to work correctly.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -39,10 +39,11 @@ private readonly Greeter.GreeterClient _client;
 
 Registering GrpcClient
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-After registering GrpcClients in IOC, we can reuse the channel by using GrpcClientFactory, this will create different clients from same channel. (Channel is expensive)
+After registering GrpcClients in IOC, we can reuse the channel by using GrpcClientFactory, this will create different clients from same channel. (Channel is expensive, client is cheap)
 In order to send request from Client Apps to Grpc Services we need to use GrpcWebHandler as the message handler of the channel.
-While creating GrpcWebHandler we should select GrpcWebText as GrpcWebMode because server streaming requires it. 
-If server streaming is not used in your app then GrpcWeb is recommended because it produces smaller messages.
+
+While creating GrpcWebHandler we should select .GrpcWebText as GrpcWebMode because server streaming requires it. 
+If server streaming is not used in your app then .GrpcWeb is recommended because it produces smaller messages.
 
 We have three steps that we can manipulate the client:
 

@@ -18,8 +18,17 @@
   <ItemGroup>
     <ProjectReference Include="..\Retailer.BlazorServer\Retailer.BlazorServer.csproj" />
     <ProjectReference Include="..\Retailer.Business\Retailer.Business.csproj" />
+    <ProjectReference Include="..\Retailer.Common\Retailer.Common.csproj" />
+    <ProjectReference Include="..\Retailer.DataAccess\Retailer.DataAccess.csproj" />
     <ProjectReference Include="..\Retailer.Data\Retailer.Data.csproj" />
+    <ProjectReference Include="..\Retailer.GrpcInternalService\Retailer.GrpcInternalService.csproj" />
+    <ProjectReference Include="..\Retailer.GrpcService\Retailer.GrpcService.csproj" />
     <ProjectReference Include="..\Retailer.Interface\Retailer.Interface.csproj" />
+    <ProjectReference Include="..\Retailer.WebAPI\Retailer.WebAPI.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="GrpcClientTest\" />
   </ItemGroup>
 
 </Project>

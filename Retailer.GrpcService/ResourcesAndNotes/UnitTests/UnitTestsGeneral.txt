@@ -1,0 +1,46 @@
+﻿
+Main Goal
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+We need to mock all of the dependencies and setting up them with expected inputs and outputs.
+Then we can run our main unit methods and check them via Asserting
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+Setting up the dependencies
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+It class is used for setting up dependencies and verifying the unit
+
+ _repositoryFactoryMock.CategoryRepositoryMock.Setup(x => x.FindOne(
+                It.IsAny<Expression<Func<Category, bool>>>(),
+                It.IsAny<bool>(),
+                It.IsAny<string[]>()))
+                .Returns(GetCategory());
+
+_repositoryFactoryMock.CategoryRepositoryMock.Verify(x => x.FindOne(
+    It.IsAny<Expression<Func<Category, bool>>>(),
+    It.IsAny<bool>(),
+    It.IsAny<string[]>()),
+    Times.Once);
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+[TestCase(11, ExpectedResult = true)]
+TestCase can be used for automating the testing process with inputs and expected values
+If ExpectedResult is specified we need to return a value from unit test
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Assert.Multiple(()=>{
+	//
+	//
+})
+
+We can use this to run all tests at once in order to get all of errors immediately
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+

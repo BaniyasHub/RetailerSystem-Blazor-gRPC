@@ -10,14 +10,17 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Additional configuration is required to successfully run gRPC on macOS.
-// For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682
-
 // Add services to the container.
-builder.Services.AddGrpc(options => {
+builder.Services.AddGrpc(options =>
+{
     options.MaxReceiveMessageSize = 2 * 1024 * 1024; // 2 MB
     options.MaxSendMessageSize = 5 * 1024 * 1024; // 5 MB
-    options.EnableDetailedErrors = true;
+
+    if (builder.Environment.IsDevelopment())
+    {
+        options.EnableDetailedErrors = true;
+    };
+
 });
 
 builder.Services.AddCors(o => o.AddPolicy("AllowAll", builder =>
@@ -48,6 +51,7 @@ var app = builder.Build();
 app.UseRouting();
 
 
+//With default option we can remove to enable it manually
 app.UseGrpcWeb(new GrpcWebOptions
 {
     DefaultEnabled = true

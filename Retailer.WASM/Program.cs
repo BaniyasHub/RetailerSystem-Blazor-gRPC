@@ -14,6 +14,7 @@ using Retailer.WASM.GrpcClient.ProductClient;
 using Retailer.WASM.MappingProfile;
 using Retailer.WASM.Service;
 using Retailer.WASM.Service.IService;
+using System.Net;
 using System.Net.Http;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -70,10 +71,13 @@ var grpcWebHandler = new GrpcWebHandler(new HttpClientHandler()
     //UseCookies = true,  
     //UseDefaultCredentials = true,
 });
+//grpcWebHandler.HttpVersion = HttpVersion.Version11; Works in both version, why?
+grpcWebHandler.HttpVersion = HttpVersion.Version20;
+
 
 //Adding GrpcClient
 builder.Services
-    .AddGrpcClient<Customer.Customer.CustomerClient>("CustomerAuthenticated", x =>
+    .AddGrpcClient<Customer.Customer.CustomerClient>("CustomerClient", x =>
         {
             x.Address = new Uri("http://localhost:7042");
             //x.Interceptors.Add()
@@ -82,7 +86,7 @@ builder.Services
     
 
 builder.Services
-    .AddGrpcClient<Product.V1.Product.ProductClient>("ProductAuthenticated", x =>
+    .AddGrpcClient<Product.V1.Product.ProductClient>("ProductClient", x =>
         {
             x.Address = new Uri("http://localhost:7042");
         })
@@ -104,6 +108,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductGrpcClient, ProductGrpcClient>();
 builder.Services.AddScoped<ICartService, CartService>();
 
+
 //Adding Memory Config
 var retailerData = new Dictionary<string, string>()
 {
@@ -118,11 +123,10 @@ var memoryConfig = new MemoryConfigurationSource { InitialData = retailerData };
 builder.Configuration.Add(memoryConfig);
 
 
-
 //Building and Running the WASM
 //await builder.Build().RunAsync();
 
-//We can create a some process behaves like a pipeline by seperating above method
+//We can create a some process behaves like a pipeline by seperating commented method above
 var host = builder.Build();
 
 
