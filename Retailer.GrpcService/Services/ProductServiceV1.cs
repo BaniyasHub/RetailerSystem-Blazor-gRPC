@@ -94,6 +94,10 @@ namespace Retailer.GrpcService.Services
 
         public override async Task<ProductModel> GetProductById(GetProductByIdRequest request, ServerCallContext context)
         {
+            if (request.Id < 1)
+            {
+                throw new ArgumentException();
+            }
             var product = await _productManager.GetProduct(request.Id);
 
             var productModel = _mapper.Map<ProductModel>(product);

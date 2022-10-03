@@ -26,8 +26,8 @@ namespace Retailer.Interface.Dtos
         [Range(1, int.MaxValue, ErrorMessage = "Please select a category")]
         public int CategoryId { get; set; }
 
-        public CategoryDto Category { get; set; }
+        public CategoryDto Category { get; set; } = new();
 
-        public List<ProductPriceDto> ProductPriceList{ get; set; }
+        public List<ProductPriceDto> ProductPriceList { get; set; } = new();
     }
 }

@@ -17,19 +17,20 @@ using System.Threading.Tasks;
 namespace Retailer.Tests.Managers
 {
     [TestFixture]
-    public class CoreManagerTests
+    public class CategoryManagerTests
     {
-        private ICategoryManager _coreManager;
+        private ICategoryManager _categoryManager;
         private RepositoryFactoryMock _repositoryFactoryMock;
 
         [SetUp]
         public void Setup()
         {
             _repositoryFactoryMock = new RepositoryFactoryMock();
+
             var mapperConfiguration = CreateMapperConfiguration();
             var mapper = mapperConfiguration.CreateMapper();
 
-            _coreManager = new CategoryManager(
+            _categoryManager = new CategoryManager(
                  _repositoryFactoryMock.GetFactoryMock(),
                  mapper
                 );
@@ -42,7 +43,7 @@ namespace Retailer.Tests.Managers
                 .FindMany(It.IsAny<Expression<Func<Category, bool>>>(), true, It.IsAny<string[]>()))
                 .Returns(GetCategoryList());
 
-            var categories = await _coreManager.GetAllCategories();
+            var categories = await _categoryManager.GetAllCategories();
 
             _repositoryFactoryMock.CategoryRepositoryMock.Verify(x => x
                 .FindMany(It.IsAny<Expression<Func<Category, bool>>>(), true, It.IsAny<string[]>()),
@@ -61,7 +62,7 @@ namespace Retailer.Tests.Managers
                 It.IsAny<string[]>()))
                 .Returns(GetCategory());
 
-            var category = await _coreManager.GetCategory(1);
+            var category = await _categoryManager.GetCategory(1);
 
             _repositoryFactoryMock.CategoryRepositoryMock.Verify(x => x.FindOne(
                 It.IsAny<Expression<Func<Category, bool>>>(),
