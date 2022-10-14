@@ -8,8 +8,10 @@ using Grpc.Net.ClientFactory;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using Retailer.WASM;
+using Retailer.WASM.ClientInterceptors;
 using Retailer.WASM.GrpcClient.ProductClient;
 using Retailer.WASM.MappingProfile;
 using Retailer.WASM.Service;
@@ -83,12 +85,13 @@ builder.Services
             //x.Interceptors.Add()
         })
     .ConfigurePrimaryHttpMessageHandler(() => grpcWebHandler);
-    
+
 
 builder.Services
     .AddGrpcClient<Product.V1.Product.ProductClient>("ProductClient", x =>
         {
             x.Address = new Uri("http://localhost:7042");
+            x.Interceptors.Add(new ClientLoggingInterceptor(new LoggerFactory()));
         })
     .ConfigureChannel(x =>
         {

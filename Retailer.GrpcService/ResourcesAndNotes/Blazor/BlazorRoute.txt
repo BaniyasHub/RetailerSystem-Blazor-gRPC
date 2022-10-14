@@ -24,10 +24,9 @@ The framework's Blazor project templates specify the MainLayout component (Share
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Components support multiple route templates using multiple @page directives. The following example component loads on requests for /blazor-route and /different-blazor-route.
-string is the default route constraint and valid if no other constraint specified
-@page "/user/{Id:int}/{Option:bool?}" we can use optional parameters like this
+Components support multiple route templates using multiple @page directives.
+string is the default route constraint and valid if no other constraint specified 
+We can use optional parameters like this ------     "/user/{Id:int}/{Option:bool?}"  --------   "/counter/{startString?}"
 For the URL /catch-all/this/is/a/test with a route template of /catch-all/{*pageRoute}, the value of PageRoute is set to this/is/a/test.
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

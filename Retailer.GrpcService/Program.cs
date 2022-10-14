@@ -7,8 +7,12 @@ using Retailer.DataAccess.Repository.IRepository;
 using Retailer.DataAccess.Repository;
 using Retailer.DataAccess.Context;
 using Microsoft.EntityFrameworkCore;
+using Retailer.GrpcService.ServerInterceptors;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+builder.Services.AddSingleton<ServerLoggingInterceptor>();
 
 // Add services to the container.
 builder.Services.AddGrpc(options =>
@@ -20,8 +24,11 @@ builder.Services.AddGrpc(options =>
     {
         options.EnableDetailedErrors = true;
     };
+}).AddServiceOptions<ProductServiceV1>(options =>
+{
+    options.Interceptors.Add<ServerLoggingInterceptor>();
+}); ;
 
-});
 
 builder.Services.AddCors(o => o.AddPolicy("AllowAll", builder =>
 {

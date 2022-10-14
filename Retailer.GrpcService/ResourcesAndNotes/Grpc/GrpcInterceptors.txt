@@ -1,0 +1,17 @@
+
+
+Definition
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Interceptors are a gRPC concept that allows apps to interact with incoming or outgoing gRPC calls. They offer a way to enrich the request processing pipeline.
+Interceptors are configured for a channel or service and executed automatically for each gRPC call.
+Since interceptors are transparent to the user's application logic, they're an excellent solution for common cases, such as logging, monitoring, authentication, and validation.
+----
+By default, the Interceptor base class doesn't do anything. Add behavior to an interceptor by overriding the appropriate base class methods in an interceptor implementation.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+

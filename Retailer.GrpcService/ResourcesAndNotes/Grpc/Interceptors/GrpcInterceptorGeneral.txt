@@ -1,0 +1,44 @@
+﻿
+Definition
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Interceptors are a gRPC concept that allows apps to interact with incoming or outgoing gRPC calls. They offer a way to enrich the request processing pipeline.
+Interceptors are configured for a channel or service and executed automatically for each gRPC call.
+Since interceptors are transparent to the user's application logic, they're an excellent solution for common cases, such as logging, monitoring, authentication, and validation.
+----
+By default, the Interceptor base class doesn't do anything. Add behavior to an interceptor by overriding the appropriate base class methods in an interceptor implementation.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+gRPC Interceptors versus Middleware
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ASP.NET Core middleware offers similar functionalities compared to interceptors in C-core-based gRPC apps. ASP.NET Core middleware and interceptors are conceptually similar. 
+
+gRPC Interceptor similarities with ASP.NET Core Middleware:
+----------------------------------------------------------------
+Are used to construct a pipeline that handles a gRPC request.
+Allow work to be performed before or after the next component in the pipeline.
+Provide access to HttpContext:
+In middleware, the HttpContext is a parameter.
+In interceptors, the HttpContext can be accessed using the ServerCallContext parameter with the ServerCallContext.GetHttpContext extension method.
+This feature is specific to interceptors running in ASP.NET Core.
+------------------------------------------------------------------------
+
+
+gRPC Interceptor differences from ASP.NET Core Middleware:
+----------------------------------------------------------------
+Interceptors:
+----------------
+Operate on the gRPC layer of abstraction using the ServerCallContext.
+Provide access to:
+The deserialized message sent to a call.
+The message returned from the call before it's serialized.
+Can catch and handle exceptions thrown from gRPC services.
+
+Middleware:
+-----------------
+Runs for all HTTP requests.
+Runs before gRPC interceptors.
+Operates on the underlying HTTP/2 messages.
+Can only access bytes from the request and response streams.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

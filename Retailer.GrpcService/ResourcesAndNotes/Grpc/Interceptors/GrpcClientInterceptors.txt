@@ -1,0 +1,102 @@
+﻿
+Client Methods
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Interceptor methods to override for client:
+---------------------------------------------
+BlockingUnaryCall: Intercepts a blocking invocation of an unary RPC.
+AsyncUnaryCall: Intercepts an asynchronous invocation of an unary RPC.
+AsyncClientStreamingCall: Intercepts an asynchronous invocation of a client-streaming RPC.
+AsyncServerStreamingCall: Intercepts an asynchronous invocation of a server-streaming RPC.
+AsyncDuplexStreamingCall: Intercepts an asynchronous invocation of a bidirectional-streaming RPC.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Client Example
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+public override AsyncUnaryCall<TResponse> AsyncUnaryCall<TRequest, TResponse>(
+        TRequest request,
+        ClientInterceptorContext<TRequest, TResponse> context,
+        AsyncUnaryCallContinuation<TRequest, TResponse> continuation)
+    {
+        _logger.LogInformation($"Starting call. Type: {context.Method.Type}. " +
+            $"Method: {context.Method.Name}.");
+        return continuation(request, context);
+    }
+
+
+Overriding AsyncUnaryCall:
+------------------------------------------
+1/Intercepts an asynchronous unary call.
+2/Logs details about the call.
+3/Calls the continuation parameter passed into the method. 
+ This invokes the next interceptor in the chain or the underlying call invoker if this is the last interceptor.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+Client Examination
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Methods on Interceptor for each kind of service method have different signatures.
+However, the concept behind continuation and context parameters remains the same:
+-----------------------------------------------------------------------------------
+** continuation is a delegate which invokes the next interceptor in the chain or the underlying call invoker (if there is no interceptor left in the chain).
+** It isn't an error to call it zero or multiple times.
+** Interceptors aren't required to return a call representation (AsyncUnaryCall in case of unary RPC) returned from the continuation delegate.
+** Omitting the delegate call and returning your own instance of call representation breaks the interceptors' chain and returns the associated response immediately.
+** context carries scoped values associated with the client-side call. Use context to pass metadata, such as security principals, credentials, or tracing data.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+Client Registration
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+It can be done either via creating channel or using factory pattern which is very straightforward.
+
+1/Using Channel Creation:
+----------------------------------------------------------------------
+using var channel = GrpcChannel.ForAddress("https://localhost:5001");
+var invoker = channel.Intercept(new ClientLoggerInterceptor());
+var client = new Greeter.GreeterClient(invoker);
+
+Uses the Intercept extension method to configure the channel to use the interceptor. Note that this method returns a CallInvoker.
+Strongly-typed gRPC clients can be created from an invoker just like a channel.
+Creates a client from the invoker. gRPC calls made by the client automatically execute the interceptor.
+
+
+The Intercept extension method can be chained to configure multiple interceptors for a channel.
+Alternatively, there is an Intercept overload that accepts multiple interceptors. 
+Interceptors are invoked in reverse order of the chained Intercept extension methods. In the preceding code, interceptors are invoked in the following order:
+** ClientLoggerInterceptor
+** ClientMonitoringInterceptor
+** ClientTokenInterceptor
+
+var invoker = channel
+    .Intercept(new ClientTokenInterceptor())
+    .Intercept(new ClientMonitoringInterceptor())
+    .Intercept(new ClientLoggerInterceptor());
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+2/Using Factory Pattern:
+----------------------------------------------------------------------
+builder.Services
+    .AddGrpcClient<Product.V1.Product.ProductClient>("ProductClient", x =>
+        {
+            x.Address = new Uri("http://localhost:7042");
+            x.Interceptors.Add(new ClientLoggingInterceptor(new LoggerFactory()));
+        })
+    .ConfigureChannel(x =>
+        {
+            x.HttpHandler = grpcWebHandler;
+            x.ServiceConfig = new ServiceConfig()
+            {
+                MethodConfigs =
+                {
+                    retryMethodConfig
+                }
+            };
+        });
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

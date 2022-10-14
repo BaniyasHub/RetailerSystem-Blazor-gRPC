@@ -48,4 +48,8 @@
     <Protobuf Include="GrpcClient\Protos\productV2.proto" GrpcServices="Client" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\files\" />
+  </ItemGroup>
+
 </Project>
